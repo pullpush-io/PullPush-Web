@@ -1,17 +1,9 @@
 <script lang="ts">
 // @ts-nocheck
-    import { retrievalTypeStore } from '$lib/stores';
     export let item;
     import Sugar from 'sugar';
     import SvelteMarkdown from 'svelte-markdown';
-    import { onDestroy } from 'svelte';
-    let retrievalType;
-    const unsubscribe = retrievalTypeStore.subscribe(value => {
-        retrievalType = value;
-    });
-    onDestroy(() => {
-        unsubscribe();
-    });
+    export let retrievalType 
 </script>
 
 {#if retrievalType === "submission"}
@@ -36,9 +28,9 @@
             </div>
             <div class="mt-3 flex justify-between flex-wrap">
                 <p class="text-xs font-semibold">/u/{item.author}</p>
-                <p class="text-xs font-semibold">{Sugar.Number.abbr(item.num_comments)} comments</p>
+                <p class="text-xs font-semibold">{Sugar.Number.abbr(item.num_comments || 0)} comments</p>
                 <p class="text-xs font-semibold">r/{item.subreddit}</p>
-                <p class="text-xs font-semibold">{Sugar.Number.abbr(item.score)} points</p>
+                <p class="text-xs font-semibold">{Sugar.Number.abbr(item.score || 0)} points</p>
                 <p class="text-xs font-semibold">{Sugar.Date.relative(new Date(item.created_utc * 1000))}</p>
             </div>
         </div>

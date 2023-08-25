@@ -31,6 +31,6 @@ export default function formVerification(form) {
     //remove score_comparator and num_comments_comparator
     delete value.score_comparator;
     delete value.num_comments_comparator;
-    delete value.type;
+    // delete value.type;
     return value;
 }

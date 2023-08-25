@@ -55,16 +55,16 @@ export async function load({ url }): QueryResponse {
 
 	let authorName = url.searchParams.get('author');
 	let query = url.searchParams.get('q');
-
-	if (query) {
-		response = await fetchPullPush('submission', url.searchParams.toString());
-	}
+	let type = url.searchParams.get('type') || 'submission';
 
 	if (authorName) {
+		response = await fetchPullPush(type, url.searchParams.toString());
 		let authorResponse = await fetchReddit(authorName);
 		if (authorResponse.toast) return response;
 		// @ts-expect-error
 		response.authorData = authorResponse.authorData;
+	} else if (query) {
+		response = await fetchPullPush(type, url.searchParams.toString());
 	}
 
 	return response;
