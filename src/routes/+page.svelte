@@ -1,8 +1,5 @@
 <script lang="ts">
 	// @ts-nocheck
-	import '@skeletonlabs/skeleton/themes/theme-rocket.css';
-	import '@skeletonlabs/skeleton/styles/skeleton.css';
-	import '../app.postcss';
 	import formVerification from '$lib/formVerification';
 	// import { PUBLIC_API_URL } from '$env/static/public';
 	import { ProgressRadial, toastStore, type ToastSettings } from '@skeletonlabs/skeleton';
@@ -68,6 +65,7 @@
 		const data = new FormData(form);
 		const value = formVerification(data);
 		const queryString = new URLSearchParams(value).toString();
+		console.log(queryString);
 		if (value.author) {
 			Promise.all([fetchReddit(value.author), fetchPullPush(retrievalType, queryString)]).then(() => {
 				loading = false;
