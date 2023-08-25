@@ -1,79 +1,37 @@
 <script lang="ts">
-	// @ts-nocheck
 	import formVerification from '$lib/formVerification';
 	// import { PUBLIC_API_URL } from '$env/static/public';
-	import { ProgressRadial, toastStore, type ToastSettings } from '@skeletonlabs/skeleton';
+	import { ProgressRadial, toastStore } from '@skeletonlabs/skeleton';
 	import ResultItem from '$lib/returnItem.svelte';
 	import UserSection from '$lib/userSection.svelte';
 	import { retrievalTypeStore } from '$lib/stores';
+	import type { RetrievalType } from '$lib/types';
+	import { goto } from '$app/navigation';
+	export let data;
 
-	let retrievalType = "submission";
+	$: {
+		if (data.toast) {
+			toastStore.trigger(data.toast);
+		}
+		loading = false;
+	}
+
+	let retrievalType: RetrievalType = 'submission';
 	let loading = false;
-	let returnData = [];
-	let authorData = {};
+
+	// @ts-expect-error
 	function changeType(e) {
-		retrievalTypeStore.set(e.target.value)
-		returnData = [];
-		authorData = {};
+		retrievalTypeStore.set(e.target.value);
 	}
-	async function fetchPullPush(retrievalType, value) {
-		try {
-			const response = await fetch(`https://api.pullpush.io/reddit/search/${retrievalType}/?${value}`)
-			const json = await response.json();
-			returnData = [];
-			returnData = json.data;
-			if (returnData.length === 0) {
-				const t: ToastSettings = {
-					message: "No results found for your search. Please try again with different parameters.",
-					background: "variant-filled-error",
-					autohide: false
-				};
-				toastStore.trigger(t);
-			}
-			return true
-		} catch {
-			const t: ToastSettings = {
-				message: "An error occurred while searching. Please try again later.",
-				background: "variant-filled-error",
-				hoverable: true
-			};
-			toastStore.trigger(t);
-			loading = false;
-		}
-	}
-	async function fetchReddit(author) {
-		try {
-			const response = await fetch(`https://www.reddit.com/user/${author.toLowerCase()}/about.json?utm_source=reddit&utm_medium=usertext&utm_name=redditdev&utm_content=t3_1p9s0w`)
-			authorData = await response.json();
-			return true
-		} catch {
-			const t: ToastSettings = {
-				message: "An error occurred while searching, please try again later.",
-				background: "variant-filled-error",
-				hoverable: true
-			};
-			toastStore.trigger(t);
-			loading = false;
-		}
-	}
-	async function handleSubmit(e) {
-		returnData = [];
+	async function handleSubmit(e: SubmitEvent) {
 		toastStore.clear();
 		e.preventDefault();
 		loading = true;
-		const form = e.target;
+		const form = e.target as HTMLFormElement;
 		const data = new FormData(form);
 		const value = formVerification(data);
 		const queryString = new URLSearchParams(value).toString();
-		console.log(queryString);
-		if (value.author) {
-			Promise.all([fetchReddit(value.author), fetchPullPush(retrievalType, queryString)]).then(() => {
-				loading = false;
-			});
-		} else {
-			await fetchPullPush(retrievalType, queryString);
-			loading = false;
-		}
+		goto(`/?${queryString}`, { invalidateAll: true });
 	}
 	$: retrievalType = $retrievalTypeStore;
 </script>
@@ -125,13 +83,19 @@
 				</div>
 			</div>
 			<div class="h-1 w-full variant-ghost-surface rounded-3xl"/>
-			{#if retrievalType === "submissions"}
+			{#if retrievalType === "submission"}
 				<div class="grid grid-cols-1 sm:grid-cols-2">
 					<div class="max-w-lg p-3">
 						<label class="label">
 							<span>Score</span>
 							<div class="flex">
-								<input name="score" class="input rounded-l-3xl" type="number" placeholder="0" step="50">
+								<input
+									name="score"
+									class="input rounded-l-3xl"
+									type="number"
+									placeholder="0"
+									step="50"
+								/>
 								<select name="score_comparator" class="select rounded-r-3xl">
 									<option value="=>">Greater Than</option>
 									<option value="<=">Less Than</option>
@@ -143,7 +107,13 @@
 						<label class="label">
 							<span>Comments</span>
 							<div class="flex">
-								<input name="num_comments" class="input rounded-l-3xl" type="number" placeholder="0" step="50">
+								<input
+									name="num_comments"
+									class="input rounded-l-3xl"
+									type="number"
+									placeholder="0"
+									step="50"
+								/>
 								<select name="num_comments_comparator" class="select rounded-r-3xl">
 									<option value="=>">Greater Than</option>
 									<option value="<=">Less Than</option>
@@ -177,7 +147,7 @@
 							<span>Contest Mode</span>
 						</label>
 					</div> -->
-				</div>	
+				</div>
 			{:else}
 				<div class="grid grid-cols-1 sm:grid-cols-2">
 					<div class="max-w-lg p-3">
@@ -214,23 +184,22 @@
 		</form>
 	</div>
 </div>
-{#if Object.keys(authorData).length > 0}
+{#if data.authorData && Object.keys(data.authorData).length > 0}
 	<div class="user flex justify-center mt-1 mx-5">
-		<UserSection author={authorData}/>
+		<UserSection author={data.authorData} />
 	</div>
 {/if}
-{#if returnData}
+{#if data.returnData}
 	<div class="results flex justify-center my-1 mx-5">
 		<div>
-			{#each returnData as item}
-				<ResultItem item={item}/>
+			{#each data.returnData as item}
+				<ResultItem {item} />
 			{/each}
 		</div>
 	</div>
 {/if}
-{#if returnData.length}
+{#if data.returnData?.length}
 	<div class="resultscount flex justify-center my-5 mx-5">
-		<p>{returnData.length} Items</p>
+		<p>{data.returnData.length} Items</p>
 	</div>
 {/if}
-

@@ -1,3 +1,4 @@
+// @ts-expect-error
 export default function formVerification(form) {
     const value = Object.fromEntries(form.entries());
     // convert before and after to epoch
