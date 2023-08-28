@@ -1,12 +1,10 @@
-import type { RetrievalType } from '$lib/types';
+import type { Datum, RetrievalType, VizRetrievalType } from '$lib/types';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 
 async function fetchPullPush(retrievalType: RetrievalType, value: string) {
 	let returnData = [];
 
-	const response = await fetch(
-		`https://api.pullpush.io/reddit/search/${retrievalType}/?${value}`
-	);
+	const response = await fetch(`https://api.pullpush.io/reddit/search/${retrievalType}/?${value}`);
 	if (response.status != 200) {
 		return {
 			toast: {
@@ -30,6 +28,24 @@ async function fetchPullPush(retrievalType: RetrievalType, value: string) {
 	return { returnData };
 }
 
+async function fetchViz(author: string, type: VizRetrievalType, datum: Datum) {
+	const response = await fetch(
+		`https://api.pullpush.io/analyze_user?user=${author}&type=${type}&datum=${datum}`
+	);
+	const data = await response.json();
+	return data;
+}
+
+async function fetchPieData(author: string) {
+	const [topicsCount, topicsKarma, commentsCount, commentsKarma] = await Promise.all([
+		fetchViz(author, 'topics', 'count'),
+		fetchViz(author, 'topics', 'karma'),
+		fetchViz(author, 'comments', 'count'),
+		fetchViz(author, 'comments', 'karma')
+	]);
+	return { topicsCount, topicsKarma, commentsCount, commentsKarma };
+}
+
 async function fetchReddit(author: string) {
 	let authorData = [];
 
@@ -46,7 +62,8 @@ async function fetchReddit(author: string) {
 		};
 	}
 	authorData = await response.json();
-	return { authorData };
+	const pieData = await fetchPieData(author);
+	return { authorData, pieData };
 }
 
 // @ts-expect-error
@@ -59,10 +76,12 @@ export async function load({ url }): QueryResponse {
 
 	if (authorName) {
 		response = await fetchPullPush(type, url.searchParams.toString());
-		let authorResponse = await fetchReddit(authorName);
-		if (authorResponse.toast) return response;
+		let { authorData, pieData } = await fetchReddit(authorName);
+		if (authorData.toast) return response;
 		// @ts-expect-error
-		response.authorData = authorResponse.authorData;
+		response.authorData = authorData;
+		// @ts-expect-error
+		response.pieData = pieData;
 	} else if (query) {
 		response = await fetchPullPush(type, url.searchParams.toString());
 	}
