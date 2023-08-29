@@ -1,5 +1,6 @@
 <script lang="ts">
 	import formVerification from '$lib/formVerification';
+	import IntersectionObserver from 'svelte-intersection-observer';
 	// import { PUBLIC_API_URL } from '$env/static/public';
 	import { ProgressRadial, toastStore, type ToastSettings } from '@skeletonlabs/skeleton';
 	import ResultItem from '$lib/returnItem.svelte';
@@ -11,13 +12,11 @@
 	let authorData = [];
 	let pieData = {};
 
-	function clearResults() {
-		returnData = [];
-		authorData = [];
-		pieData = {};
+	function clearSearchParams() {
 		urlParams = {
 			author: null,
 			subreddit: null,
+			type: 'submission',
 			q: null,
 			before: null,
 			after: null,
@@ -26,7 +25,14 @@
 			score_comparator: null,
 			num_comments_comparator: null
 		};
+	}
+
+	function clearResults() {
+		returnData = [];
+		authorData = [];
+		pieData = {};
 		loading = false;
+		clearSearchParams();
 	}
 
 	async function fetchAll() {
@@ -43,19 +49,25 @@
 		let query = url.searchParams.get('q');
 		let type: RetrievalType = url.searchParams.get('type') || 'submission';
 
-		console.log('onMount started');
-
 		if (authorName) {
-			({ returnData } = await fetchPullPush(type, url.searchParams.toString()));
-			let { authorData: ad, pieData: pd, toast: t } = await fetchReddit(authorName);
-			if (t) {
-				toastStore.trigger(t);
-				return;
+			[returnData, authorData, pieData] = await Promise.all([
+				fetchPullPush(type, url.searchParams.toString()),
+				fetchAuthorData(authorName),
+				fetchPieData(authorName)
+			]);
+
+			for (let val of [returnData, authorData, pieData]) {
+				if (val.toast) {
+					toastStore.trigger(val.toast);
+					val = [];
+				}
 			}
-			authorData = ad;
-			pieData = pd;
 		} else if (query) {
-			({ returnData } = await fetchPullPush(type, url.searchParams.toString()));
+			returnData = await fetchPullPush(type, url.searchParams.toString());
+			if (returnData.toast) {
+				toastStore.trigger(returnData.toast);
+				returnData = [];
+			}
 		}
 
 		for (let [key, val] of $page.url.searchParams.entries()) {
@@ -67,8 +79,6 @@
 				urlParams[key] = val;
 			}
 		}
-
-		console.log('done');
 
 		loading = false;
 	}
@@ -92,24 +102,64 @@
 		_returnData = json.data;
 
 		if (_returnData.length === 0) {
-			const t: ToastSettings = {
-				message: 'No results found for your search. Please try again with different parameters.',
-				background: 'variant-filled-error',
-				autohide: false
+			return {
+				toast: {
+					message: 'No results found for your search. Please try again with different parameters.',
+					background: 'variant-filled-error',
+					autohide: false
+				}
 			};
-			return { returnData: _returnData, toast: t };
 		}
-		return { returnData: _returnData };
+		return _returnData;
+	}
+
+	let paginationSpinner = false;
+	let paginationCompleted = false;
+
+	async function paginate() {
+		if (paginationCompleted) return;
+		paginationSpinner = true;
+		const url = $page.url;
+		let type: RetrievalType = url.searchParams.get('type') || 'submission';
+		let query = '';
+
+		for (let [key, val] of url.searchParams) {
+			if (['type', 'before'].includes(key)) continue;
+			query = query + (query == '' ? '' : '&') + `${key}=${val}`;
+		}
+
+		query += `&before=${returnData.at(-1).created_utc}`;
+
+		const response = await fetch(`https://api.pullpush.io/reddit/search/${type}/?${query}`);
+		if (response.status != 200) {
+			toastStore.trigger({
+				message: 'An error occurred while getting data. Please try again later.',
+				background: 'variant-filled-error',
+				hoverable: true
+			});
+			return;
+		}
+
+		const json = await response.json();
+		let newData = json.data;
+
+		if (newData.length == 0) {
+			paginationCompleted = true;
+			return;
+		}
+
+		returnData.push(...newData);
+		returnData = returnData; // NECESSARY FOR REACTIVITY
 	}
 
 	async function fetchViz(author: string, type: VizRetrievalType, datum: Datum) {
 		const response = await fetch(
 			`https://api.pullpush.io/analyze_user?user=${author}&type=${type}&datum=${datum}`
 		);
-		// if (response.status != 200) {
-		// TODO: toast trigger
-		// return
-		// }
+		if (response.status != 200) {
+			// TODO: toast error
+			return [];
+		}
 		const data = await response.json();
 		return data;
 	}
@@ -124,7 +174,7 @@
 		return { topicsCount, topicsKarma, commentsCount, commentsKarma };
 	}
 
-	async function fetchReddit(author: string) {
+	async function fetchAuthorData(author: string) {
 		const response = await fetch(
 			`https://www.reddit.com/user/${author.toLowerCase()}/about.json?utm_source=reddit&utm_medium=usertext&utm_name=redditdev&utm_content=t3_1p9s0w`
 		);
@@ -138,8 +188,7 @@
 			};
 		}
 		authorData = await response.json();
-		const pieData = await fetchPieData(author);
-		return { authorData, pieData };
+		return authorData;
 	}
 
 	function formatDate(date: number) {
@@ -190,6 +239,8 @@
 		submittedRetrievalType = urlParams.type;
 		goto(`/?${queryString}`);
 	}
+
+	let itemCountDiv: HTMLDivElement;
 </script>
 
 <div class="search flex justify-center my-5 mx-5">
@@ -289,8 +340,8 @@
 									class="select rounded-r-3xl"
 									bind:value={urlParams.score_comparator}
 								>
-									<option value="=>">Greater Than</option>
-									<option value="<=">Less Than</option>
+									<option value=">">Greater Than</option>
+									<option value="<">Less Than</option>
 								</select>
 							</div>
 						</label>
@@ -312,8 +363,8 @@
 									class="select rounded-r-3xl"
 									bind:value={urlParams.num_comments_comparator}
 								>
-									<option value="=>">Greater Than</option>
-									<option value="<=">Less Than</option>
+									<option value=">">Greater Than</option>
+									<option value="<">Less Than</option>
 								</select>
 							</div>
 						</label>
@@ -389,7 +440,11 @@
 						<span>Search</span>
 					</button>
 				{/if}
-				<button class="btn variant-filled rounded-3xl m-3" type="reset">
+				<button
+					class="btn variant-filled rounded-3xl m-3"
+					type="button"
+					on:click={clearSearchParams}
+				>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32"
 						><path
 							fill="currentColor"
@@ -418,8 +473,9 @@
 		</div>
 	{/if}
 	{#if returnData?.length}
-		<div class="resultscount flex justify-center my-5 mx-5">
+		<div class="resultscount flex justify-center my-5 mx-5" bind:this={itemCountDiv}>
 			<p>{returnData.length} Items</p>
 		</div>
+		<IntersectionObserver element={itemCountDiv} on:intersect={paginate} />
 	{/if}
 {/if}

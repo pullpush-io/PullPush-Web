@@ -4,19 +4,16 @@
 	export let data: PieData;
 	export let numberType: NumberRepresentation;
 	let _data: TransformedPieData = [];
-	data = data.sort(([n1, v1], [n2, v2]) => v1 - v2);
-	data = data.reverse();
-
-	// TODO: make it responsive
+	data = data.sort(([n1, v1], [n2, v2]) => v2 - v1);
 
 	function getPercentage(val: number) {
 		let degrees = val * (180 / Math.PI);
 		return Math.floor((degrees / 360) * 100);
 	}
 
-	for (let i = 0; i < 5; i++) {
+	for (let i = 0; i < 9; i++) {
 		if (i == 4) {
-			let value = data.slice(5).reduce((acc, [_, v]) => {
+			let value = data.slice(9).reduce((acc, [_, v]) => {
 				if (v <= 0) return acc;
 				return acc + v;
 			}, 0);
@@ -40,7 +37,7 @@
 	// Create the pie layout and arc generator.
 	const pie = d3
 		.pie()
-		.sort(null)
+		.sort((a, b) => b.value - a.value)
 		.value((d) => d.value);
 
 	const arcPath = d3
@@ -87,10 +84,17 @@
 <div class="flex flex-col gap-4">
 	<slot><!-- optional fallback --></slot>
 	<div class="flex flex-col justify-center gap-1">
-		{#each arcs as slice}
+		{#each arcs.sort((a, b) => b.value - a.value) as slice}
 			<div class="flex flex-row items-center gap-1">
 				<div class="w-3 h-3 rounded-full" style:background-color={colourScale(slice.data.name)} />
-				<span class="pb-1">{slice.data.name}</span>
+				<p class="pb-1">
+					{slice.data.name}
+					<span class="font-bold"
+						>{numberType == 'percentage'
+							? getPercentage(Math.abs(slice.startAngle - slice.endAngle)) + '%'
+							: slice.data.value}</span
+					>
+				</p>
 			</div>
 		{/each}
 	</div>
