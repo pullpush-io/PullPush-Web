@@ -16,58 +16,42 @@
 	let currentPie = 'topicsCount';
 	let numberType: NumberRepresentation = 'literal';
 
-	let arcs,
-		contentRect,
-		avatarWidth = 0,
-		avatarHeight = 0;
-
-	$: {
-		avatarWidth = contentRect?.width;
-		avatarHeight = contentRect?.height;
-	}
+	let arcs;
 </script>
 
 <div class="max-w-5xl w-full">
 	<div
 		class="flex flex-col items-center bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface my-3"
 	>
-		<div class="flex flex-row items-center justify-center p-8">
-			<a
-				class="w-1/4"
-				href={`https://reddit.com/user/${author.data.name}`}
-				target="_blank"
-				rel="noreferrer"
-			>
+		<div class="flex flex-col sm:flex-row w-full items-center justify-between p-8 md:gap-8 gap-16">
+			<a href={`https://reddit.com/user/${author.data.name}`} target="_blank" rel="noreferrer">
 				<div class="flex flex-col justify-center">
 					<img
 						src={author.data.snoovatar_img}
 						alt="avatar"
-						class="rounded-3xl"
+						class="rounded-3xl w-64 sm:w-32 lg:w-52 md:w-44"
 						on:error={(e) => {
 							e.target.src = '/nan.png';
 						}}
-						bind:contentRect
 					/>
 					<h1 class="text-2xl text-center">/u/{author.data.name}</h1>
 				</div>
 			</a>
-			<div class="w-3/4">
-				{#key (currentPie, numberType, contentRect)}
-					<PieChart bind:arcs data={pieData[currentPie]} {numberType} {avatarWidth} {avatarHeight}>
-						<select class="select rounded-3xl" bind:value={currentPie}>
-							{#each Object.keys(pieData) as value}
-								<option {value}>{pieNames[value]}</option>
-							{/each}
-						</select>
-						<select class="select rounded-3xl" bind:value={numberType}>
-							<option value="percentage">Percentage</option>
-							<option value="literal">Literal</option>
-						</select>
-					</PieChart>
-				{/key}
-			</div>
+			{#key (currentPie, numberType)}
+				<PieChart bind:arcs data={pieData[currentPie]} {numberType}>
+					<select class="select rounded-3xl" bind:value={currentPie}>
+						{#each Object.keys(pieData) as value}
+							<option {value}>{pieNames[value]}</option>
+						{/each}
+					</select>
+					<select class="select rounded-3xl" bind:value={numberType}>
+						<option value="percentage">Percentage</option>
+						<option value="literal">Literal</option>
+					</select>
+				</PieChart>
+			{/key}
 		</div>
-		<div class="flex justify-between w-full px-8">
+		<div class="flex justify-between w-full sm:px-8 px-0">
 			<p class="text-xs font-semibold">
 				{Sugar.Number.abbr(author.data.total_karma)} total karma
 			</p>

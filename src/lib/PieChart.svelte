@@ -3,11 +3,11 @@
 	import type { NumberRepresentation, PieData, TransformedPieData } from './types';
 	export let data: PieData;
 	export let numberType: NumberRepresentation;
-	export let avatarWidth: number;
-	export let avatarHeight: number;
 	let _data: TransformedPieData = [];
 	data = data.sort(([n1, v1], [n2, v2]) => v1 - v2);
 	data = data.reverse();
+
+	// TODO: make it responsive
 
 	function getPercentage(val: number) {
 		let degrees = val * (180 / Math.PI);
@@ -28,8 +28,8 @@
 		_data[i] = { name, value };
 	}
 
-	const width = avatarWidth + 50;
-	const height = avatarHeight + 50;
+	const width = 224;
+	const height = 224;
 
 	// Create the color scale.
 	const colourScale = d3
@@ -55,46 +55,43 @@
 	// A separate arc generator for labels.
 	const arcLabel = d3.arc().innerRadius(labelRadius).outerRadius(labelRadius);
 
-	export const arcs = pie(_data);
+	const arcs = pie(_data);
 </script>
 
 <!-- TODO: add percentage / literal value choice -->
 
-<div class="flex flex-row items-center justify-end gap-8">
-	<svg
-		{width}
-		{height}
-		viewBox="{-width / 2}, {-height / 2}, {width}, {height}"
-		style:max-width="100%"
-		style:height="auto"
-	>
-		<g class="data">
-			{#each arcs as slice}
-				<path d={arcPath(slice)} fill={colourScale(slice.data.name)} stroke="white" />
+<svg
+	class="w-64 lg:w-56 md:w-48 sm:w-40"
+	viewBox="-112 -112 224 224"
+	style:max-width="100%"
+	style:height="auto"
+>
+	<g class="data">
+		{#each arcs as slice}
+			<path d={arcPath(slice)} fill={colourScale(slice.data.name)} stroke="white" />
 
-				{#if slice.endAngle - slice.startAngle > 0.25}
-					<text
-						class="text-2xl font-bold"
-						text-anchor="middle"
-						transform="translate({[arcLabel.centroid(slice)[0], arcLabel.centroid(slice)[1] + 10]})"
-					>
-						{numberType == 'percentage'
-							? getPercentage(Math.abs(slice.startAngle - slice.endAngle)) + '%'
-							: slice.data.value}
-					</text>
-				{/if}
-			{/each}
-		</g>
-	</svg>
-	<div class="flex flex-col gap-4">
-		<slot><!-- optional fallback --></slot>
-		<div class="flex flex-col justify-center gap-1">
-			{#each arcs as slice}
-				<div class="flex flex-row items-center gap-1">
-					<div class="w-3 h-3 rounded-full" style:background-color={colourScale(slice.data.name)} />
-					<span class="pb-1">{slice.data.name}</span>
-				</div>
-			{/each}
-		</div>
+			{#if slice.endAngle - slice.startAngle > 0.25}
+				<text
+					class="text-2xl font-bold"
+					text-anchor="middle"
+					transform="translate({[arcLabel.centroid(slice)[0], arcLabel.centroid(slice)[1] + 10]})"
+				>
+					{numberType == 'percentage'
+						? getPercentage(Math.abs(slice.startAngle - slice.endAngle)) + '%'
+						: slice.data.value}
+				</text>
+			{/if}
+		{/each}
+	</g>
+</svg>
+<div class="flex flex-col gap-4">
+	<slot><!-- optional fallback --></slot>
+	<div class="flex flex-col justify-center gap-1">
+		{#each arcs as slice}
+			<div class="flex flex-row items-center gap-1">
+				<div class="w-3 h-3 rounded-full" style:background-color={colourScale(slice.data.name)} />
+				<span class="pb-1">{slice.data.name}</span>
+			</div>
+		{/each}
 	</div>
 </div>
