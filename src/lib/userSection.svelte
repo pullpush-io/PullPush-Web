@@ -15,8 +15,6 @@
 
 	let currentPie = 'topicsCount';
 	let numberType: NumberRepresentation = 'literal';
-
-	let arcs;
 </script>
 
 <div class="max-w-5xl w-full">
@@ -37,8 +35,8 @@
 					<h1 class="text-2xl text-center">/u/{author.data.name}</h1>
 				</div>
 			</a>
-			{#key (currentPie, numberType)}
-				<PieChart bind:arcs data={pieData[currentPie]} {numberType}>
+			{#key [currentPie, numberType]}
+				<PieChart data={pieData[currentPie]} {numberType}>
 					<select class="select rounded-3xl" bind:value={currentPie}>
 						{#each Object.keys(pieData) as value}
 							<option {value}>{pieNames[value]}</option>
