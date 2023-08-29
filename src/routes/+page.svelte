@@ -1,14 +1,146 @@
 <script lang="ts">
 	import formVerification from '$lib/formVerification';
 	// import { PUBLIC_API_URL } from '$env/static/public';
-	import { ProgressRadial, toastStore } from '@skeletonlabs/skeleton';
+	import { ProgressRadial, toastStore, type ToastSettings } from '@skeletonlabs/skeleton';
 	import ResultItem from '$lib/returnItem.svelte';
 	import UserSection from '$lib/userSection.svelte';
-	import type { RetrievalType } from '$lib/types';
-	import { goto } from '$app/navigation';
+	import type { Datum, RetrievalType, VizRetrievalType } from '$lib/types';
+	import { goto, afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
-	export let data;
+	let returnData = [];
+	let authorData = [];
+	let pieData = {};
+
+	function clearResults() {
+		returnData = [];
+		authorData = [];
+		pieData = {};
+		urlParams = {
+			author: null,
+			subreddit: null,
+			q: null,
+			before: null,
+			after: null,
+			score: null,
+			num_comments: null,
+			score_comparator: null,
+			num_comments_comparator: null
+		};
+		loading = false;
+	}
+
+	async function fetchAll() {
+		loading = true;
+		const url = $page.url;
+		const paramsLength = Array.from(url.searchParams).length;
+
+		if (paramsLength == 0 || (paramsLength == 1 && url.searchParams.has('type'))) {
+			clearResults();
+			return;
+		}
+
+		let authorName = url.searchParams.get('author');
+		let query = url.searchParams.get('q');
+		let type: RetrievalType = url.searchParams.get('type') || 'submission';
+
+		console.log('onMount started');
+
+		if (authorName) {
+			({ returnData } = await fetchPullPush(type, url.searchParams.toString()));
+			let { authorData: ad, pieData: pd, toast: t } = await fetchReddit(authorName);
+			if (t) {
+				toastStore.trigger(t);
+				return;
+			}
+			authorData = ad;
+			pieData = pd;
+		} else if (query) {
+			({ returnData } = await fetchPullPush(type, url.searchParams.toString()));
+		}
+
+		for (let [key, val] of $page.url.searchParams.entries()) {
+			if (['before', 'after'].includes(key)) {
+				// @ts-expect-error
+				urlParams[key] = formatDate(+val);
+			} else {
+				// @ts-expect-error
+				urlParams[key] = val;
+			}
+		}
+
+		console.log('done');
+
+		loading = false;
+	}
+
+	async function fetchPullPush(retrievalType: RetrievalType, value: string) {
+		let _returnData = [];
+
+		const response = await fetch(
+			`https://api.pullpush.io/reddit/search/${retrievalType}/?${value}`
+		);
+		if (response.status != 200) {
+			return {
+				toast: {
+					message: 'An error occurred while searching. Please try again later.',
+					background: 'variant-filled-error',
+					hoverable: true
+				}
+			};
+		}
+		const json = await response.json();
+		_returnData = json.data;
+
+		if (_returnData.length === 0) {
+			const t: ToastSettings = {
+				message: 'No results found for your search. Please try again with different parameters.',
+				background: 'variant-filled-error',
+				autohide: false
+			};
+			return { returnData: _returnData, toast: t };
+		}
+		return { returnData: _returnData };
+	}
+
+	async function fetchViz(author: string, type: VizRetrievalType, datum: Datum) {
+		const response = await fetch(
+			`https://api.pullpush.io/analyze_user?user=${author}&type=${type}&datum=${datum}`
+		);
+		// if (response.status != 200) {
+		// TODO: toast trigger
+		// return
+		// }
+		const data = await response.json();
+		return data;
+	}
+
+	async function fetchPieData(author: string) {
+		const [topicsCount, topicsKarma, commentsCount, commentsKarma] = await Promise.all([
+			fetchViz(author, 'topics', 'count'),
+			fetchViz(author, 'topics', 'karma'),
+			fetchViz(author, 'comments', 'count'),
+			fetchViz(author, 'comments', 'karma')
+		]);
+		return { topicsCount, topicsKarma, commentsCount, commentsKarma };
+	}
+
+	async function fetchReddit(author: string) {
+		const response = await fetch(
+			`https://www.reddit.com/user/${author.toLowerCase()}/about.json?utm_source=reddit&utm_medium=usertext&utm_name=redditdev&utm_content=t3_1p9s0w`
+		);
+		if (response.status != 200) {
+			return {
+				toast: {
+					message: 'An error occurred while searching. Please try again later.',
+					background: 'variant-filled-error',
+					hoverable: true
+				}
+			};
+		}
+		authorData = await response.json();
+		const pieData = await fetchPieData(author);
+		return { authorData, pieData };
+	}
 
 	function formatDate(date: number) {
 		let d = new Date(date * 1000),
@@ -29,9 +161,12 @@
 		return _date;
 	}
 
+	afterNavigate(fetchAll);
+
 	let urlParams = {
 		author: null,
 		subreddit: null,
+		type: 'submission',
 		q: null,
 		before: null,
 		after: null,
@@ -41,28 +176,8 @@
 		num_comments_comparator: null
 	};
 
-	let retrievalType: RetrievalType = 'submission';
 	let submittedRetrievalType: RetrievalType = 'submission';
 	let loading = false;
-
-	$: {
-		if (data.toast) {
-			toastStore.trigger(data.toast);
-		}
-		loading = false;
-	}
-
-	onMount(() => {
-		for (let [key, val] of $page.url.searchParams.entries()) {
-			if (['before', 'after'].includes(key)) {
-				// @ts-expect-error
-				urlParams[key] = formatDate(+val);
-			} else {
-				// @ts-expect-error
-				urlParams[key] = val;
-			}
-		}
-	});
 
 	async function handleSubmit(e: SubmitEvent) {
 		toastStore.clear();
@@ -71,8 +186,9 @@
 		const data = new FormData(form);
 		const value = formVerification(data);
 		const queryString = new URLSearchParams(value).toString();
-		submittedRetrievalType = retrievalType;
-		goto(`/?${queryString}`, { invalidateAll: true });
+		// @ts-expect-error
+		submittedRetrievalType = urlParams.type;
+		goto(`/?${queryString}`);
 	}
 </script>
 
@@ -109,7 +225,7 @@
 				<div class="max-w-xs p-3">
 					<label class="label">
 						<span>Search for</span>
-						<select name="type" class="select rounded-3xl" bind:value={retrievalType}>
+						<select required name="type" class="select rounded-3xl" bind:value={urlParams.type}>
 							<option value="submission">Posts</option>
 							<option value="comment">Comments</option>
 						</select>
@@ -120,6 +236,7 @@
 				<label class="label">
 					<span>Query</span>
 					<input
+						required={urlParams.author == null}
 						name="q"
 						class="input rounded-3xl"
 						type="text"
@@ -153,7 +270,7 @@
 				</div>
 			</div>
 			<div class="h-1 w-full variant-ghost-surface rounded-3xl" />
-			{#if retrievalType === 'submission'}
+			{#if urlParams.type === 'submission'}
 				<div class="grid grid-cols-1 sm:grid-cols-2">
 					<div class="max-w-lg p-3">
 						<label class="label">
@@ -286,23 +403,23 @@
 	</div>
 </div>
 {#if !loading}
-	{#if data.authorData && Object.keys(data.authorData).length > 0}
+	{#if authorData && Object.keys(authorData).length > 0}
 		<div class="user flex justify-center mt-1 mx-5">
-			<UserSection author={data.authorData} pieData={data.pieData} />
+			<UserSection author={authorData} {pieData} />
 		</div>
 	{/if}
-	{#if data.returnData}
+	{#if returnData}
 		<div class="results flex justify-center my-1 mx-5">
 			<div>
-				{#each data.returnData as item}
+				{#each returnData as item}
 					<ResultItem retrievalType={submittedRetrievalType} {item} />
 				{/each}
 			</div>
 		</div>
 	{/if}
-	{#if data.returnData?.length}
+	{#if returnData?.length}
 		<div class="resultscount flex justify-center my-5 mx-5">
-			<p>{data.returnData.length} Items</p>
+			<p>{returnData.length} Items</p>
 		</div>
 	{/if}
 {/if}
