@@ -113,12 +113,12 @@
 		return _returnData;
 	}
 
-	let paginationSpinner = false;
+	let paginating = false;
 	let paginationCompleted = false;
 
 	async function paginate() {
 		if (paginationCompleted) return;
-		paginationSpinner = true;
+		paginating = true;
 		const url = $page.url;
 		let type: RetrievalType = url.searchParams.get('type') || 'submission';
 		let query = '';
@@ -137,6 +137,7 @@
 				background: 'variant-filled-error',
 				hoverable: true
 			});
+			paginating = false;
 			return;
 		}
 
@@ -145,11 +146,13 @@
 
 		if (newData.length == 0) {
 			paginationCompleted = true;
+			paginating = false;
 			return;
 		}
 
 		returnData.push(...newData);
 		returnData = returnData; // NECESSARY FOR REACTIVITY
+		paginating = false;
 	}
 
 	async function fetchViz(author: string, type: VizRetrievalType, datum: Datum) {
@@ -473,9 +476,18 @@
 		</div>
 	{/if}
 	{#if returnData?.length}
-		<div class="resultscount flex justify-center my-5 mx-5" bind:this={itemCountDiv}>
+		<div
+			class:hidden={paginating}
+			class="resultscount flex justify-center m-4"
+			bind:this={itemCountDiv}
+		>
 			<p>{returnData.length} Items</p>
 		</div>
+		{#if paginating}
+			<div class="w-full flex items-center justify-center h-24 m-4">
+				<ProgressRadial width="w-24" />
+			</div>
+		{/if}
 		<IntersectionObserver element={itemCountDiv} on:intersect={paginate} />
 	{/if}
 {/if}

@@ -55,8 +55,6 @@
 	const arcs = pie(_data);
 </script>
 
-<!-- TODO: add percentage / literal value choice -->
-
 <svg
 	class="w-64 lg:w-56 md:w-48 sm:w-40"
 	viewBox="-112 -112 224 224"
