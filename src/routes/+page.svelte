@@ -2,7 +2,7 @@
 	import formVerification from '$lib/formVerification';
 	import IntersectionObserver from 'svelte-intersection-observer';
 	// import { PUBLIC_API_URL } from '$env/static/public';
-	import { ProgressRadial, toastStore, type ToastSettings } from '@skeletonlabs/skeleton';
+	import { ProgressRadial, toastStore } from '@skeletonlabs/skeleton';
 	import ResultItem from '$lib/returnItem.svelte';
 	import UserSection from '$lib/userSection.svelte';
 	import type { Datum, RetrievalType, VizRetrievalType } from '$lib/types';
@@ -11,20 +11,10 @@
 	let returnData = [];
 	let authorData = [];
 	let pieData = {};
+	let type: RetrievalType = 'submission';
 
 	function clearSearchParams() {
-		urlParams = {
-			author: null,
-			subreddit: null,
-			type: 'submission',
-			q: null,
-			before: null,
-			after: null,
-			score: null,
-			num_comments: null,
-			score_comparator: null,
-			num_comments_comparator: null
-		};
+		// TODO
 	}
 
 	function clearResults() {
@@ -33,6 +23,54 @@
 		pieData = {};
 		loading = false;
 		clearSearchParams();
+	}
+
+	function formatDate(date: number) {
+		let d = new Date(date * 1000),
+			month = '' + (d.getMonth() + 1),
+			day = '' + d.getDate(),
+			year = d.getFullYear();
+
+		if (month.length < 2) {
+			month = '0' + month;
+		}
+
+		if (day.length < 2) {
+			day = '0' + day;
+		}
+
+		let _date = [year, month, day].join('-');
+
+		return _date;
+	}
+
+	function populateForm() {
+		let params = $page.url.searchParams;
+
+		if (params.has('score') && ['<', '>'].includes(params.get('score')[0])) {
+			params.set('score_comparator', params.get('score')[0]);
+			params.set('score', +params.get('score').slice(1));
+		}
+
+		if (params.has('num_comments') && ['<', '>'].includes(params.get('num_comments')[0])) {
+			params.set('num_comment_comparator', params.get('num_comments')[0]);
+			params.set('num_comments', +params.get('num_comments').slice(1));
+		}
+
+		const inputs = document.getElementsByTagName('input');
+		const selects = document.getElementsByTagName('select');
+
+		for (let input of [...inputs, ...selects]) {
+			if (params.has(input.name)) {
+				if (['before', 'after'].includes(input.name)) {
+					// @ts-expect-error
+					input.value = formatDate(+params.get(input.name));
+				} else {
+					// @ts-expect-error
+					input.value = params.get(input.name);
+				}
+			}
+		}
 	}
 
 	async function fetchAll() {
@@ -47,7 +85,7 @@
 
 		let authorName = url.searchParams.get('author');
 		let query = url.searchParams.get('q');
-		let type: RetrievalType = url.searchParams.get('type') || 'submission';
+		let type: RetrievalType = (url.searchParams.get('type') as RetrievalType) || 'submission';
 
 		if (authorName) {
 			[returnData, authorData, pieData] = await Promise.all([
@@ -70,15 +108,7 @@
 			}
 		}
 
-		for (let [key, val] of $page.url.searchParams.entries()) {
-			if (['before', 'after'].includes(key)) {
-				// @ts-expect-error
-				urlParams[key] = formatDate(+val);
-			} else {
-				// @ts-expect-error
-				urlParams[key] = val;
-			}
-		}
+		populateForm();
 
 		loading = false;
 	}
@@ -194,39 +224,7 @@
 		return authorData;
 	}
 
-	function formatDate(date: number) {
-		let d = new Date(date * 1000),
-			month = '' + (d.getMonth() + 1),
-			day = '' + d.getDate(),
-			year = d.getFullYear();
-
-		if (month.length < 2) {
-			month = '0' + month;
-		}
-
-		if (day.length < 2) {
-			day = '0' + day;
-		}
-
-		let _date = [year, month, day].join('-');
-
-		return _date;
-	}
-
 	afterNavigate(fetchAll);
-
-	let urlParams = {
-		author: null,
-		subreddit: null,
-		type: 'submission',
-		q: null,
-		before: null,
-		after: null,
-		score: null,
-		num_comments: null,
-		score_comparator: null,
-		num_comments_comparator: null
-	};
 
 	let submittedRetrievalType: RetrievalType = 'submission';
 	let loading = false;
@@ -238,8 +236,7 @@
 		const data = new FormData(form);
 		const value = formVerification(data);
 		const queryString = new URLSearchParams(value).toString();
-		// @ts-expect-error
-		submittedRetrievalType = urlParams.type;
+		submittedRetrievalType = type;
 		goto(`/?${queryString}`);
 	}
 
@@ -255,31 +252,19 @@
 						<span
 							>Username<span class="text-[10px] ml-2 text-green-400">yields analytics</span></span
 						>
-						<input
-							name="author"
-							class="input rounded-3xl"
-							type="text"
-							placeholder="spez"
-							bind:value={urlParams.author}
-						/>
+						<input name="author" class="input rounded-3xl" type="text" placeholder="spez" />
 					</label>
 				</div>
 				<div class="max-w-xs p-3">
 					<label class="label">
 						<span>Subreddit</span>
-						<input
-							name="subreddit"
-							class="input rounded-3xl"
-							type="text"
-							placeholder="funny"
-							bind:value={urlParams.subreddit}
-						/>
+						<input name="subreddit" class="input rounded-3xl" type="text" placeholder="funny" />
 					</label>
 				</div>
 				<div class="max-w-xs p-3">
 					<label class="label">
 						<span>Search for</span>
-						<select required name="type" class="select rounded-3xl" bind:value={urlParams.type}>
+						<select required name="type" class="select rounded-3xl" bind:value={type}>
 							<option value="submission">Posts</option>
 							<option value="comment">Comments</option>
 						</select>
@@ -289,66 +274,44 @@
 			<div class="pb-3 px-3">
 				<label class="label">
 					<span>Query</span>
-					<input
-						required={urlParams.author == null}
-						name="q"
-						class="input rounded-3xl"
-						type="text"
-						placeholder="Search Term"
-						bind:value={urlParams.q}
-					/>
+					<input name="q" class="input rounded-3xl" type="text" placeholder="Search Term" />
 				</label>
 			</div>
 			<div class="grid grid-cols-1 sm:grid-cols-2">
 				<div class="max-w-lg p-3">
 					<label class="label">
 						<span>Before Date</span>
-						<input
-							type="date"
-							class="input rounded-3xl"
-							name="before"
-							bind:value={urlParams.before}
-						/>
+						<input type="date" class="input rounded-3xl" name="before" />
 					</label>
 				</div>
 				<div class="max-w-lg p-3">
 					<label class="label">
 						<span>After Date</span>
-						<input
-							type="date"
-							class="input rounded-3xl"
-							name="after"
-							bind:value={urlParams.after}
-						/>
+						<input type="date" class="input rounded-3xl" name="after" />
 					</label>
 				</div>
 			</div>
 			<div class="h-1 w-full variant-ghost-surface rounded-3xl" />
-			{#if urlParams.type === 'submission'}
-				<div class="grid grid-cols-1 sm:grid-cols-2">
-					<div class="max-w-lg p-3">
-						<label class="label">
-							<span>Score</span>
-							<div class="flex">
-								<input
-									name="score"
-									class="input rounded-l-3xl"
-									type="number"
-									placeholder="0"
-									step="50"
-									bind:value={urlParams.score}
-								/>
-								<select
-									name="score_comparator"
-									class="select rounded-r-3xl"
-									bind:value={urlParams.score_comparator}
-								>
-									<option value=">">Greater Than</option>
-									<option value="<">Less Than</option>
-								</select>
-							</div>
-						</label>
-					</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2">
+				<div class="max-w-lg p-3">
+					<label class="label">
+						<span>Score</span>
+						<div class="flex">
+							<input
+								name="score"
+								class="input rounded-l-3xl"
+								type="number"
+								placeholder="0"
+								step="50"
+							/>
+							<select name="score_comparator" class="select rounded-r-3xl">
+								<option value=">">Greater Than</option>
+								<option value="<">Less Than</option>
+							</select>
+						</div>
+					</label>
+				</div>
+				{#if type == 'submission'}
 					<div class="max-w-lg p-3">
 						<label class="label">
 							<span>Comments</span>
@@ -359,20 +322,16 @@
 									type="number"
 									placeholder="0"
 									step="50"
-									bind:value={urlParams.num_comments}
 								/>
-								<select
-									name="num_comments_comparator"
-									class="select rounded-r-3xl"
-									bind:value={urlParams.num_comments_comparator}
-								>
+								<select name="num_comments_comparator" class="select rounded-r-3xl">
 									<option value=">">Greater Than</option>
 									<option value="<">Less Than</option>
 								</select>
 							</div>
 						</label>
 					</div>
-					<!-- <div class="p-3 grid grid-cols-1 sm:grid-cols-2">
+				{/if}
+				<!-- <div class="p-3 grid grid-cols-1 sm:grid-cols-2">
 						<label class="label">
 							<input name="over_18" class="checkbox rounded-lg" type="checkbox">
 							<span>NSFW</span>
@@ -398,23 +357,34 @@
 							<span>Contest Mode</span>
 						</label>
 					</div> -->
-				</div>
-			{:else}
-				<div class="grid grid-cols-1 sm:grid-cols-2">
-					<div class="max-w-lg p-3">
-						<label class="label">
+			</div>
+
+			<div class="grid grid-cols-1 sm:grid-cols-2">
+				<div class="max-w-lg p-3">
+					<label class="label">
+						<span>IDs</span>
+						<input class="input rounded-3xl" type="text" placeholder="ju82rny,ju80bov" />
+						<!-- {#if urlParams.type == 'submission'}
 							<span>Submission ID</span>
-							<input name="link_id" class="input rounded-3xl" type="text" placeholder="15ekc5i" />
-						</label>
-					</div>
-					<div class="max-w-lg p-3">
-						<label class="label">
+							<input
+								use:clearID={'comment'}
+								class="input rounded-3xl"
+								type="text"
+								placeholder="15ekc5i"
+							/>
+						{:else}
 							<span>Comment ID's</span>
-							<input name="ids" class="input rounded-3xl" placeholder="ju82rny,ju80bov" />
-						</label>
-					</div>
+							<input
+								use:clearID={'submission'}
+								name="ids"
+								class="input rounded-3xl"
+								placeholder="ju82rny,ju80bov"
+							/>
+						{/if} -->
+					</label>
 				</div>
-			{/if}
+			</div>
+
 			<div>
 				{#if loading}
 					<button class="btn variant-filled rounded-3xl m-3" type="button" disabled>

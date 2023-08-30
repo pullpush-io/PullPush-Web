@@ -24,13 +24,11 @@
 				{/if}
 				{item.title}
 			</h1>
-			<div>
-				{#if item.selftext}
-					<div class="mt-2">
-						<SvelteMarkdown source={item.selftext} />
-					</div>
-				{/if}
-			</div>
+			{#if item.selftext}
+				<div class="mt-2">
+					<SvelteMarkdown source={item.selftext} />
+				</div>
+			{/if}
 			<div class="mt-3 flex justify-between flex-wrap">
 				<p class="text-xs font-semibold">/u/{item.author}</p>
 				<p class="text-xs font-semibold">{Sugar.Number.abbr(item.num_comments || 0)} comments</p>
