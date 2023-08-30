@@ -80,8 +80,16 @@
 	}
 
 	async function fetchAll() {
+		populateForm();
 		loading = true;
 		const url = $page.url;
+
+		const paramsLength = Array.from(url.searchParams).length;
+		if (paramsLength == 0 || (paramsLength == 1 && url.searchParams.has('type'))) {
+			clearResults();
+			return;
+		}
+
 		let authorName = url.searchParams.get('author');
 		let type: RetrievalType = (url.searchParams.get('type') as RetrievalType) || 'submission';
 
@@ -102,7 +110,6 @@
 			}
 		}
 
-		populateForm();
 		loading = false;
 	}
 
