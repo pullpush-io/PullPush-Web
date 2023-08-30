@@ -50,11 +50,15 @@
 		if (params.has('score') && ['<', '>'].includes(params.get('score')[0])) {
 			params.set('score_comparator', params.get('score')[0]);
 			params.set('score', +params.get('score').slice(1));
+		} else if (params.has('score')) {
+			params.set('score', +params.get('score'));
 		}
 
 		if (params.has('num_comments') && ['<', '>'].includes(params.get('num_comments')[0])) {
 			params.set('num_comment_comparator', params.get('num_comments')[0]);
 			params.set('num_comments', +params.get('num_comments').slice(1));
+		} else if (params.has('num_comments')) {
+			params.set('num_comments', +params.get('num_comments'));
 		}
 
 		const inputs = document.getElementsByTagName('input');
@@ -69,6 +73,8 @@
 					// @ts-expect-error
 					input.value = params.get(input.name);
 				}
+			} else {
+				input.value = null;
 			}
 		}
 	}
@@ -76,15 +82,7 @@
 	async function fetchAll() {
 		loading = true;
 		const url = $page.url;
-		const paramsLength = Array.from(url.searchParams).length;
-
-		if (paramsLength == 0 || (paramsLength == 1 && url.searchParams.has('type'))) {
-			clearResults();
-			return;
-		}
-
 		let authorName = url.searchParams.get('author');
-		let query = url.searchParams.get('q');
 		let type: RetrievalType = (url.searchParams.get('type') as RetrievalType) || 'submission';
 
 		if (authorName) {
@@ -93,23 +91,18 @@
 				fetchAuthorData(authorName),
 				fetchPieData(authorName)
 			]);
-
-			for (let val of [returnData, authorData, pieData]) {
-				if (val.toast) {
-					toastStore.trigger(val.toast);
-					val = [];
-				}
-			}
-		} else if (query) {
+		} else {
 			returnData = await fetchPullPush(type, url.searchParams.toString());
-			if (returnData.toast) {
-				toastStore.trigger(returnData.toast);
-				returnData = [];
+		}
+
+		for (let val of [returnData, authorData, pieData]) {
+			if (val.toast) {
+				toastStore.trigger(val.toast);
+				val = [];
 			}
 		}
 
 		populateForm();
-
 		loading = false;
 	}
 
@@ -150,7 +143,7 @@
 		if (paginationCompleted) return;
 		paginating = true;
 		const url = $page.url;
-		let type: RetrievalType = url.searchParams.get('type') || 'submission';
+		let type: RetrievalType = (url.searchParams.get('type') as RetrievalType) || 'submission';
 		let query = '';
 
 		for (let [key, val] of url.searchParams) {
@@ -190,8 +183,13 @@
 			`https://api.pullpush.io/analyze_user?user=${author}&type=${type}&datum=${datum}`
 		);
 		if (response.status != 200) {
-			// TODO: toast error
-			return [];
+			return {
+				toast: {
+					message: 'An error occurred while getting data. Please try again later.',
+					background: 'variant-filled-error',
+					hoverable: true
+				}
+			};
 		}
 		const data = await response.json();
 		return data;
@@ -311,6 +309,12 @@
 						</div>
 					</label>
 				</div>
+				<div class="max-w-lg p-3">
+					<label class="label">
+						<span>IDs</span>
+						<input class="input rounded-3xl" type="text" placeholder="ju82rny,ju80bov" />
+					</label>
+				</div>
 				{#if type == 'submission'}
 					<div class="max-w-lg p-3">
 						<label class="label">
@@ -357,32 +361,6 @@
 							<span>Contest Mode</span>
 						</label>
 					</div> -->
-			</div>
-
-			<div class="grid grid-cols-1 sm:grid-cols-2">
-				<div class="max-w-lg p-3">
-					<label class="label">
-						<span>IDs</span>
-						<input class="input rounded-3xl" type="text" placeholder="ju82rny,ju80bov" />
-						<!-- {#if urlParams.type == 'submission'}
-							<span>Submission ID</span>
-							<input
-								use:clearID={'comment'}
-								class="input rounded-3xl"
-								type="text"
-								placeholder="15ekc5i"
-							/>
-						{:else}
-							<span>Comment ID's</span>
-							<input
-								use:clearID={'submission'}
-								name="ids"
-								class="input rounded-3xl"
-								placeholder="ju82rny,ju80bov"
-							/>
-						{/if} -->
-					</label>
-				</div>
 			</div>
 
 			<div>
@@ -436,7 +414,7 @@
 			<UserSection author={authorData} {pieData} />
 		</div>
 	{/if}
-	{#if returnData}
+	{#if Array.isArray(returnData)}
 		<div class="results flex justify-center my-1 mx-5">
 			<div>
 				{#each returnData as item}
