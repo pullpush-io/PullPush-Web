@@ -14,7 +14,12 @@
 	let type: RetrievalType = 'submission';
 
 	function clearSearchParams() {
-		// TODO
+		const inputs = document.getElementsByTagName('input');
+		const selects = document.getElementsByTagName('select');
+
+		for (let input of [...inputs, ...selects]) {
+			input.value = null;
+		}
 	}
 
 	function clearResults() {
@@ -319,11 +324,11 @@
 				<div class="max-w-lg p-3">
 					<label class="label">
 						<span>IDs</span>
-						<input class="input rounded-3xl" type="text" placeholder="ju82rny,ju80bov" />
+						<input name="ids" class="input rounded-3xl" type="text" placeholder="ju82rny,ju80bov" />
 					</label>
 				</div>
-				{#if type == 'submission'}
-					<div class="max-w-lg p-3">
+				<div class="max-w-lg p-3">
+					{#if type == 'submission'}
 						<label class="label">
 							<span>Comments</span>
 							<div class="flex">
@@ -340,8 +345,14 @@
 								</select>
 							</div>
 						</label>
-					</div>
-				{/if}
+					{:else if type == 'comment'}
+						<label class="label">
+							<span>Submission ID</span>
+							<input name="link_id" class="input rounded-3xl" type="text" placeholder="ju82rny" />
+						</label>
+					{/if}
+				</div>
+
 				<!-- <div class="p-3 grid grid-cols-1 sm:grid-cols-2">
 						<label class="label">
 							<input name="over_18" class="checkbox rounded-lg" type="checkbox">

@@ -7,7 +7,7 @@
 </script>
 
 {#if retrievalType === 'submission'}
-	<a href={`https://reddit.com${item.permalink}`} target="_blank" rel="noreferrer">
+	<a class="card" href={`https://reddit.com${item.permalink}`} target="_blank" rel="noreferrer">
 		<div
 			class="bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface my-3"
 		>
@@ -41,13 +41,14 @@
 		</div>
 	</a>
 {:else}
-	<a href={`https://reddit.com${item.permalink}`} target="_blank" rel="noreferrer">
+	<a class="card" href={`https://reddit.com${item.permalink}`} target="_blank" rel="noreferrer">
 		<div
 			class="bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface my-3"
 		>
-			<h1 class="sm:text-md font-bold break-all">
-				{item.body}
-			</h1>
+			<!-- <h1 class="sm:text-md break-all"> -->
+			<SvelteMarkdown source={item.body} />
+			<!-- {item.body} -->
+			<!-- </h1> -->
 			<div class="mt-3 flex justify-between flex-wrap">
 				<p class="text-xs font-semibold">/u/{item.author}</p>
 				<p class="text-xs font-semibold">r/{item.subreddit}</p>
@@ -59,9 +60,3 @@
 		</div>
 	</a>
 {/if}
-
-<style>
-	:global(p) {
-		word-break: break-all;
-	}
-</style>
