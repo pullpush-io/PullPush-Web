@@ -2,7 +2,7 @@
 	// @ts-nocheck
 	export let item;
 	import Sugar from 'sugar';
-	import SvelteMarkdown from 'svelte-markdown';
+	import Markdown from './Markdown.svelte';
 	export let retrievalType;
 </script>
 
@@ -26,7 +26,7 @@
 			</h1>
 			{#if item.selftext}
 				<div class="mt-2">
-					<SvelteMarkdown source={item.selftext} />
+					<Markdown source={item.selftext} />
 				</div>
 			{/if}
 			<div class="mt-3 flex justify-between flex-wrap">
@@ -45,10 +45,7 @@
 		<div
 			class="bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface my-3"
 		>
-			<!-- <h1 class="sm:text-md break-all"> -->
-			<SvelteMarkdown source={item.body} />
-			<!-- {item.body} -->
-			<!-- </h1> -->
+			<Markdown source={item.body} />
 			<div class="mt-3 flex justify-between flex-wrap">
 				<p class="text-xs font-semibold">/u/{item.author}</p>
 				<p class="text-xs font-semibold">r/{item.subreddit}</p>
