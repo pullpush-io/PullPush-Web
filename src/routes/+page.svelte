@@ -13,6 +13,8 @@
 	let pieData = {};
 	let type: RetrievalType = 'submission';
 
+	// FIXME: markdown parsing on previous posts break after pagination
+
 	function clearSearchParams() {
 		const inputs = document.getElementsByTagName('input');
 		const selects = document.getElementsByTagName('select');
@@ -439,9 +441,11 @@
 	{#if Array.isArray(returnData)}
 		<div class="results flex justify-center my-1 mx-5">
 			<div>
-				{#each returnData as item}
-					<ResultItem retrievalType={submittedRetrievalType} {item} />
-				{/each}
+				{#key returnData}
+					{#each returnData as item}
+						<ResultItem retrievalType={submittedRetrievalType} {item} />
+					{/each}
+				{/key}
 			</div>
 		</div>
 	{/if}
