@@ -89,9 +89,11 @@
 	}
 
 	async function fetchAll() {
+		const url = $page.url;
+		if (url.searchParams.size == 0) return;
+
 		populateForm();
 		loading = true;
-		const url = $page.url;
 
 		let authorName = url.searchParams.get('author');
 		let type: RetrievalType = (url.searchParams.get('type') as RetrievalType) || 'submission';
@@ -104,6 +106,8 @@
 			]);
 		} else {
 			returnData = await fetchPullPush(type, url.searchParams.toString());
+			authorData = [];
+			pieData = [];
 		}
 
 		for (let val of [returnData, authorData, pieData]) {
