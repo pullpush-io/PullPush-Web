@@ -119,10 +119,24 @@
 	async function fetchPullPush(retrievalType: RetrievalType, value: string) {
 		let _returnData = [];
 
-		const response = await fetch(
-			`https://api.pullpush.io/reddit/search/${retrievalType}/?${value}`
-		);
-		if (response.status != 200) {
+		try {
+			const response = await fetch(
+				`https://api.pullpush.io/reddit/search/${retrievalType}/?${value}`
+			);
+			const json = await response.json();
+			_returnData = json.data;
+			if (_returnData.length === 0) {
+				return {
+					toast: {
+						message:
+							'No results found for your search. Please try again with different parameters.',
+						background: 'variant-filled-error',
+						autohide: false
+					}
+				};
+			}
+			return _returnData;
+		} catch {
 			return {
 				toast: {
 					message: 'An error occurred while searching. Please try again later.',
@@ -131,19 +145,6 @@
 				}
 			};
 		}
-		const json = await response.json();
-		_returnData = json.data;
-
-		if (_returnData.length === 0) {
-			return {
-				toast: {
-					message: 'No results found for your search. Please try again with different parameters.',
-					background: 'variant-filled-error',
-					autohide: false
-				}
-			};
-		}
-		return _returnData;
 	}
 
 	let paginating = false;
@@ -163,36 +164,38 @@
 
 		query += `&before=${returnData.at(-1).created_utc}`;
 
-		const response = await fetch(`https://api.pullpush.io/reddit/search/${type}/?${query}`);
-		if (response.status != 200) {
+		try {
+			const response = await fetch(`https://api.pullpush.io/reddit/search/${type}/?${query}`);
+			const json = await response.json();
+			let newData = json.data;
+
+			if (newData.length == 0) {
+				paginationCompleted = true;
+				paginating = false;
+				return;
+			}
+
+			returnData.push(...newData);
+			returnData = returnData; // NECESSARY FOR REACTIVITY
+			paginating = false;
+		} catch {
 			toastStore.trigger({
 				message: 'An error occurred while getting data. Please try again later.',
 				background: 'variant-filled-error',
 				hoverable: true
 			});
 			paginating = false;
-			return;
 		}
-
-		const json = await response.json();
-		let newData = json.data;
-
-		if (newData.length == 0) {
-			paginationCompleted = true;
-			paginating = false;
-			return;
-		}
-
-		returnData.push(...newData);
-		returnData = returnData; // NECESSARY FOR REACTIVITY
-		paginating = false;
 	}
 
 	async function fetchViz(author: string, type: VizRetrievalType, datum: Datum) {
-		const response = await fetch(
-			`https://api.pullpush.io/analyze_user?user=${author}&type=${type}&datum=${datum}`
-		);
-		if (response.status != 200) {
+		try {
+			const response = await fetch(
+				`https://api.pullpush.io/analyze_user?user=${author}&type=${type}&datum=${datum}`
+			);
+			const data = await response.json();
+			return data;
+		} catch {
 			return {
 				toast: {
 					message: 'An error occurred while getting data. Please try again later.',
@@ -201,8 +204,6 @@
 				}
 			};
 		}
-		const data = await response.json();
-		return data;
 	}
 
 	async function fetchPieData(author: string) {
@@ -216,10 +217,13 @@
 	}
 
 	async function fetchAuthorData(author: string) {
-		const response = await fetch(
-			`https://www.reddit.com/user/${author.toLowerCase()}/about.json?utm_source=reddit&utm_medium=usertext&utm_name=redditdev&utm_content=t3_1p9s0w`
-		);
-		if (response.status != 200) {
+		try {
+			const response = await fetch(
+				`https://www.reddit.com/user/${author.toLowerCase()}/about.json?utm_source=reddit&utm_medium=usertext&utm_name=redditdev&utm_content=t3_1p9s0w`
+			);
+			authorData = await response.json();
+			return authorData;
+		} catch {
 			return {
 				toast: {
 					message: 'An error occurred while searching. Please try again later.',
@@ -228,8 +232,6 @@
 				}
 			};
 		}
-		authorData = await response.json();
-		return authorData;
 	}
 
 	afterNavigate(fetchAll);
