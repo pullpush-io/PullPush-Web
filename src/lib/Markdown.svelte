@@ -9,23 +9,13 @@
 		if (src?.match(alphanumericRegex)) {
 			token.tag = 'p';
 			token.type = 'paragraph_open';
-			token.nesting = 1;
-			token.children = [
-				// @ts-expect-error
-				{
-					attrs: null,
-					block: true,
-					children: null,
-					content: 'text',
-					hidden: false,
-					map: null,
-					markup: 'specific-stuff',
-					meta: null,
-					nesting: 0,
-					tag: '',
-					type: 'text'
-				}
-			];
+			let text = '';
+
+			for (let _token of md.parse(token.attrGet('title') || '', {})) {
+				if (_token.type == 'inline') text = _token.content;
+			}
+
+			return `<p>${text}</p>`;
 		}
 
 		return slf.renderToken(tokens, idx, options);
