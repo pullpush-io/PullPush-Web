@@ -7,8 +7,6 @@
 		const token = tokens[idx];
 		let src = token.attrGet('src');
 		if (src?.match(alphanumericRegex)) {
-			token.tag = 'p';
-			token.type = 'paragraph_open';
 			let text = '';
 
 			for (let _token of md.parse(token.attrGet('title') || '', {})) {
