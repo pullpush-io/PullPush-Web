@@ -4,6 +4,7 @@
 	export let pieData;
 	import Sugar from 'sugar';
 	import PieChart from './PieChart.svelte';
+	import DefaultAvatar from './DefaultAvatar.svelte';
 	import type { NumberRepresentation } from './types';
 
 	const pieNames = {
@@ -25,7 +26,8 @@
 			<a href={`https://reddit.com/user/${author.data.name}`} target="_blank" rel="noreferrer">
 				<div class="flex flex-col justify-center">
 					<img
-						src={author.data.snoovatar_img}
+						src={author.data.snoovatar_img ||
+							'https://i.redd.it/snoovatar/avatars/74cfc2e6-f5ba-4f88-875e-084a455b2c84.png'}
 						alt="avatar"
 						class="rounded-3xl w-64 sm:w-32 lg:w-52 md:w-44"
 						on:error={(e) => {
