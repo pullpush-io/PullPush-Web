@@ -4,7 +4,6 @@
 	export let pieData;
 	import Sugar from 'sugar';
 	import PieChart from './PieChart.svelte';
-	import DefaultAvatar from './DefaultAvatar.svelte';
 	import type { NumberRepresentation } from './types';
 
 	const pieNames = {
