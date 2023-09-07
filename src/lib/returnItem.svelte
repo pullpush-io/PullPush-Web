@@ -25,7 +25,7 @@
 				{item.title}
 			</h1>
 			{#if item.selftext}
-				<div class="mt-2">
+				<div class="mt-2 overflow-hidden">
 					<Markdown source={item.selftext} />
 				</div>
 			{/if}
