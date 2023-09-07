@@ -266,7 +266,7 @@
 						<span
 							>Username<span class="text-[10px] ml-2 text-green-400">yields analytics</span></span
 						>
-						<input name="author" class="input rounded-3xl" type="text" placeholder="spez" />
+						<input name="author" class="input rounded-3xl" type="text" placeholder="maxwellhill" />
 					</label>
 				</div>
 				<div class="max-w-xs p-3">
@@ -352,7 +352,12 @@
 					{:else if type == 'comment'}
 						<label class="label">
 							<span>Submission ID</span>
-							<input name="link_id" class="input rounded-3xl" type="text" placeholder="ju82rny" />
+							<input
+								name="link_id"
+								class="input rounded-3xl"
+								type="text"
+								placeholder="r45a5n,bdl3o"
+							/>
 						</label>
 					{/if}
 				</div>
