@@ -13,6 +13,9 @@
 	let pieData = {};
 	let type: RetrievalType = 'submission';
 
+	$: console.log(returnData);
+	$: console.log(authorData);
+
 	function clearSearchParams() {
 		const inputs = document.getElementsByTagName('input');
 		const selects = document.getElementsByTagName('select');

@@ -51,14 +51,19 @@
 		</div>
 		<div class="flex justify-between w-full sm:px-8 px-0">
 			<p class="text-xs font-semibold">
-				{Sugar.Number.abbr(author.data.total_karma)} total karma
-			</p>
-			<p class="text-xs font-semibold">{Sugar.Number.abbr(author.data.link_karma)} link karma</p>
-			<p class="text-xs font-semibold">
-				{Sugar.Number.abbr(author.data.comment_karma)} comment karma
+				{author.data.total_karma ? Sugar.Number.abbr(author.data.total_karma) : 'unknown'} total karma
 			</p>
 			<p class="text-xs font-semibold">
-				Created {Sugar.Date.relative(new Date(author.data.created_utc * 1000))}
+				{author.data.link_karma ? Sugar.Number.abbr(author.data.link_karma) : 'unknown'} link karma
+			</p>
+			<p class="text-xs font-semibold">
+				{author.data.comment_karma ? Sugar.Number.abbr(author.data.comment_karma) : 'unknown'} comment
+				karma
+			</p>
+			<p class="text-xs font-semibold">
+				Created {author.data.created_utc
+					? Sugar.Date.relative(new Date(author.data.created_utc * 1000))
+					: 'unknown'}
 			</p>
 		</div>
 	</div>
