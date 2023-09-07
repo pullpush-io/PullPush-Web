@@ -13,8 +13,6 @@
 	let pieData = {};
 	let type: RetrievalType = 'submission';
 
-	// FIXME: markdown parsing on previous posts break after pagination
-
 	function clearSearchParams() {
 		const inputs = document.getElementsByTagName('input');
 		const selects = document.getElementsByTagName('select');
