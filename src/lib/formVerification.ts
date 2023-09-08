@@ -8,6 +8,9 @@ export default function formVerification(form) {
 	if (value.after) {
 		value.after = new Date(value.after).getTime() / 1000;
 	}
+	if (value.author) {
+		value.author = value.author.toLowerCase();
+	}
 	// convert checkboxes to bools
 	for (const key in value) {
 		if (value[key] === 'on') {
