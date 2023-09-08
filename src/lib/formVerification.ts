@@ -10,6 +10,18 @@ export default function formVerification(form) {
 	}
 	if (value.author) {
 		value.author = value.author.toLowerCase();
+		if (value.author.startsWith('/u/')) {
+			value.author = value.author.replace('/u/', '');
+		} else if (value.author.startsWith('u/')) {
+			value.author = value.author.replace('u/', '');
+		}
+	}
+	if (value.subreddit) {
+		if (value.subreddit.startsWith('/r/')) {
+			value.subreddit = value.subreddit.replace('/r/', '');
+		} else if (value.subreddit.startsWith('r/')) {
+			value.subreddit = value.subreddit.replace('r/', '');
+		}
 	}
 	// convert checkboxes to bools
 	for (const key in value) {
