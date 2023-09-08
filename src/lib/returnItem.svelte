@@ -33,11 +33,11 @@
 			<div class="mt-3 flex justify-between flex-wrap">
 				<p class="text-xs font-semibold">/u/{item.author}</p>
 				<p class="text-xs font-semibold">
-					{item.num_comments ? Sugar.Number.abbr(item.num_comments) : 'unknown'} comments
+					{Number.isInteger(item.num_comments) ? Sugar.Number.abbr(item.num_comments) : 'unknown'} comments
 				</p>
 				<p class="text-xs font-semibold">r/{item.subreddit}</p>
 				<p class="text-xs font-semibold">
-					{item.score ? Sugar.Number.abbr(item.score) : 'unknown'} points
+					{Number.isInteger(item.score) ? Sugar.Number.abbr(item.score) : 'unknown'} points
 				</p>
 				<p class="text-xs font-semibold">
 					{Sugar.Date.relative(new Date(item.created_utc * 1000))}
@@ -55,7 +55,7 @@
 				<p class="text-xs font-semibold">/u/{item.author}</p>
 				<p class="text-xs font-semibold">r/{item.subreddit}</p>
 				<p class="text-xs font-semibold">
-					{item.score ? Sugar.Number.abbr(item.score) : 'unknown'} points
+					{Number.isInteger(item.score) ? Sugar.Number.abbr(item.score) : 'unknown'} points
 				</p>
 				<p class="text-xs font-semibold">
 					{Sugar.Date.relative(new Date(item.created_utc * 1000))}
