@@ -4,7 +4,6 @@
 	import Sugar from 'sugar';
 	import Markdown from './Markdown.svelte';
 	export let retrievalType;
-	console.log(retrievalType);
 </script>
 
 {#if retrievalType === 'submission'}
