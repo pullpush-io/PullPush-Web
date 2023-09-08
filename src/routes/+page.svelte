@@ -12,6 +12,7 @@
 	let authorData = [];
 	let pieData = {};
 	let type: RetrievalType = 'submission';
+	let requestCompleted = false;
 
 	$: console.log(returnData);
 	$: console.log(authorData);
@@ -27,6 +28,8 @@
 				input.value = null;
 			}
 		}
+
+		requestCompleted = false;
 	}
 
 	function clearResults() {
@@ -97,6 +100,7 @@
 
 		populateForm();
 		loading = true;
+		requestCompleted = false;
 
 		let authorName = url.searchParams.get('author');
 		let type: RetrievalType = (url.searchParams.get('type') as RetrievalType) || 'submission';
@@ -121,6 +125,7 @@
 		}
 
 		loading = false;
+		requestCompleted = true;
 	}
 
 	async function fetchPullPush(retrievalType: RetrievalType, value: string) {
@@ -132,16 +137,6 @@
 			);
 			const json = await response.json();
 			_returnData = json.data;
-			if (_returnData.length === 0) {
-				return {
-					toast: {
-						message:
-							'No results found for your search. Please try again with different parameters.',
-						background: 'variant-filled-error',
-						autohide: false
-					}
-				};
-			}
 			return _returnData;
 		} catch {
 			return {
@@ -469,5 +464,13 @@
 			</div>
 		{/if}
 		<IntersectionObserver element={itemCountDiv} on:intersect={paginate} />
+	{:else if requestCompleted}
+		<div class="w-full flex justify-center">
+			<div
+				class="flex justify-center self-center alert card variant-ghost-warning max-w-5xl w-full rounded-3xl"
+			>
+				No results found for your search.
+			</div>
+		</div>
 	{/if}
 {/if}

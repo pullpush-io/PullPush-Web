@@ -38,15 +38,19 @@
 			</a>
 			{#key [currentPie, numberType]}
 				<PieChart data={pieData[currentPie]} {numberType}>
-					<select class="select rounded-3xl" bind:value={currentPie}>
-						{#each Object.keys(pieData) as value}
-							<option {value}>{pieNames[value]}</option>
-						{/each}
-					</select>
-					<select class="select rounded-3xl" bind:value={numberType}>
-						<option value="percentage">Percentage</option>
-						<option value="literal">Literal</option>
-					</select>
+					{#if pieData[currentPie].length > 0}
+						<select class="select rounded-3xl" bind:value={currentPie}>
+							{#each Object.keys(pieData) as value}
+								<option {value}>{pieNames[value]}</option>
+							{/each}
+						</select>
+						<select class="select rounded-3xl" bind:value={numberType}>
+							<option value="percentage">Percentage</option>
+							<option value="literal">Literal</option>
+						</select>
+					{:else}
+						<div>No visualizations available.</div>
+					{/if}
 				</PieChart>
 			{/key}
 		</div>

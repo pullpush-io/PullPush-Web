@@ -11,7 +11,9 @@
 		return Math.floor((degrees / 360) * 100);
 	}
 
-	for (let i = 0; i < 9; i++) {
+	const sliceCount = data.length < 9 ? data.length : 9;
+
+	for (let i = 0; i < sliceCount; i++) {
 		if (i == 4) {
 			let value = data.slice(9).reduce((acc, [_, v]) => {
 				if (v <= 0) return acc;
