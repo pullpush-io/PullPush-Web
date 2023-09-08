@@ -15,9 +15,6 @@
 	let type: RetrievalType = $page.url.searchParams.get('type') || 'submission';
 	let requestCompleted = false;
 
-	$: console.log(returnData);
-	$: console.log(authorData);
-
 	function clearSearchParams() {
 		const inputs = document.getElementsByTagName('input');
 		const selects = document.getElementsByTagName('select');
@@ -31,6 +28,7 @@
 		}
 
 		requestCompleted = false;
+		noParametersWarning = false;
 	}
 
 	function clearResults() {
@@ -95,9 +93,17 @@
 		}
 	}
 
+	let noParametersWarning = false;
+
 	async function fetchAll() {
 		const url = $page.url;
-		if (url.searchParams.size == 0) return;
+		if (url.searchParams.size == 0) {
+			return;
+		} else if (url.searchParams.size == 1 && url.searchParams.has('type')) {
+			noParametersWarning = true;
+			loading = false;
+			return;
+		}
 
 		populateForm();
 		loading = true;
@@ -246,6 +252,7 @@
 	async function handleSubmit(e: SubmitEvent) {
 		toastStore.clear();
 		loading = true;
+		noParametersWarning = false;
 		const form = e.target as HTMLFormElement;
 		const data = new FormData(form);
 		const value = formVerification(data);
@@ -475,4 +482,13 @@
 			</div>
 		</div>
 	{/if}
+{/if}
+{#if noParametersWarning}
+	<div class="w-full flex justify-center">
+		<div
+			class="flex justify-center self-center alert card variant-ghost-warning max-w-5xl w-full rounded-3xl"
+		>
+			Empty search parameters.
+		</div>
+	</div>
 {/if}
