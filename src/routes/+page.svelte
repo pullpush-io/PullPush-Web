@@ -11,7 +11,8 @@
 	let returnData = [];
 	let authorData = [];
 	let pieData = {};
-	let type: RetrievalType = 'submission';
+	// @ts-expect-error
+	let type: RetrievalType = $page.url.searchParams.get('type') || 'submission';
 	let requestCompleted = false;
 
 	$: console.log(returnData);
@@ -238,7 +239,8 @@
 
 	afterNavigate(fetchAll);
 
-	let submittedRetrievalType: RetrievalType = 'submission';
+	// @ts-expect-error
+	let submittedRetrievalType: RetrievalType = $page.url.searchParams.get('type') || 'submission';
 	let loading = false;
 
 	async function handleSubmit(e: SubmitEvent) {
