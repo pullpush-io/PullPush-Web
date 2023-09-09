@@ -5,7 +5,9 @@
 	import Sugar from 'sugar';
 	import PieChart from './PieChart.svelte';
 	import type { NumberRepresentation } from './types';
+	import { page } from '$app/stores';
 
+	const authorName = author?.data?.name || $page.url.searchParams.get('author');
 	const pieNames = {
 		topicsCount: 'Topics - Count',
 		topicsKarma: 'Topics - Karma',
@@ -22,9 +24,9 @@
 		class="flex flex-col items-center bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface my-3"
 	>
 		<div class="flex flex-col sm:flex-row w-full items-center justify-between p-8 md:gap-8 gap-16">
-			<a href={`https://reddit.com/user/${author.data.name}`} target="_blank" rel="noreferrer">
+			<a href={`https://reddit.com/user/${authorName}`} target="_blank" rel="noreferrer">
 				<div class="flex flex-col justify-center">
-					{#if author.data.snoovatar_img}
+					{#if author?.data?.snoovatar_img}
 						<img
 							src={author.data.snoovatar_img}
 							alt="avatar"
@@ -66,7 +68,7 @@
 							</g>
 						</svg>
 					{/if}
-					<h1 class="text-2xl text-center">/u/{author.data.name}</h1>
+					<h1 class="text-2xl text-center">/u/{authorName}</h1>
 				</div>
 			</a>
 			{#key [currentPie, numberType]}
@@ -89,17 +91,17 @@
 		</div>
 		<div class="flex justify-between w-full sm:px-8 px-0">
 			<p class="text-xs font-semibold">
-				{author.data.total_karma ? Sugar.Number.abbr(author.data.total_karma) : 'unknown'} total karma
+				{author?.data?.total_karma ? Sugar.Number.abbr(author.data.total_karma) : 'unknown'} total karma
 			</p>
 			<p class="text-xs font-semibold">
-				{author.data.link_karma ? Sugar.Number.abbr(author.data.link_karma) : 'unknown'} link karma
+				{author?.data?.link_karma ? Sugar.Number.abbr(author.data.link_karma) : 'unknown'} link karma
 			</p>
 			<p class="text-xs font-semibold">
-				{author.data.comment_karma ? Sugar.Number.abbr(author.data.comment_karma) : 'unknown'} comment
+				{author?.data?.comment_karma ? Sugar.Number.abbr(author.data.comment_karma) : 'unknown'} comment
 				karma
 			</p>
 			<p class="text-xs font-semibold">
-				Created {author.data.created_utc
+				Created {author?.data?.created_utc
 					? Sugar.Date.relative(new Date(author.data.created_utc * 1000))
 					: 'unknown'}
 			</p>
