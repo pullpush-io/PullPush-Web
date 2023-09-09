@@ -26,9 +26,13 @@
 		<div class="flex flex-col sm:flex-row w-full items-center justify-between p-8 md:gap-8 gap-16">
 			<a href={`https://reddit.com/user/${authorName}`} target="_blank" rel="noreferrer">
 				<div class="flex flex-col justify-center">
-					{#if author?.data?.snoovatar_img}
+					{#if author?.data?.snoovatar_img || author?.data?.icon_img}
+						{@const icon_img = author.data.icon_img}
+						{@const questionMarkIndex = icon_img.includes('?')
+							? icon_img.indexOf('?')
+							: icon_img.length}
 						<img
-							src={author.data.snoovatar_img}
+							src={author?.data?.snoovatar_img || icon_img.slice(0, questionMarkIndex)}
 							alt="avatar"
 							class="rounded-3xl w-64 sm:w-32 lg:w-52 md:w-44"
 							on:error={(e) => {
