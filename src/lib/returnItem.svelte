@@ -3,11 +3,26 @@
 	export let item;
 	import Sugar from 'sugar';
 	import Markdown from './Markdown.svelte';
-	export let retrievalType;
+	import type { RetrievalType } from './types';
+	export let retrievalType: RetrievalType;
+
+	function createPermalink() {
+		const { subreddit, link_id, id } = item;
+		if (retrievalType == 'submission') {
+			return `/r/${subreddit}/comments/${link_id.slice(3)}`;
+		} else {
+			return `/r/${subreddit}/comments/${link_id.slice(3)}/comment/${id}`;
+		}
+	}
 </script>
 
 {#if retrievalType === 'submission'}
-	<a class="card" href={`https://reddit.com${item.permalink}`} target="_blank" rel="noreferrer">
+	<a
+		class="card"
+		href={`https://reddit.com${item.permalink || createPermalink()}`}
+		target="_blank"
+		rel="noreferrer"
+	>
 		<div
 			class="bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface my-3"
 		>
@@ -45,7 +60,12 @@
 		</div>
 	</a>
 {:else}
-	<a class="card" href={`https://reddit.com${item.permalink}`} target="_blank" rel="noreferrer">
+	<a
+		class="card"
+		href={`https://reddit.com${item.permalink || createPermalink()}`}
+		target="_blank"
+		rel="noreferrer"
+	>
 		<div
 			class="bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface my-3"
 		>
