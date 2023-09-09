@@ -15,7 +15,7 @@
 	let type: RetrievalType = $page.url.searchParams.get('type') || 'submission';
 	let requestCompleted = false;
 
-	function clearSearchParams() {
+	function clearInputFields() {
 		const inputs = document.getElementsByTagName('input');
 		const selects = document.getElementsByTagName('select');
 
@@ -26,17 +26,17 @@
 				input.value = null;
 			}
 		}
-
-		requestCompleted = false;
-		noParametersWarning = false;
 	}
 
 	function clearResults() {
+		goto('/');
 		returnData = [];
 		authorData = [];
 		pieData = {};
 		loading = false;
-		clearSearchParams();
+		requestCompleted = false;
+		noParametersWarning = false;
+		clearInputFields();
 	}
 
 	function formatDate(date: number) {
@@ -425,11 +425,7 @@
 						<span>Search</span>
 					</button>
 				{/if}
-				<button
-					class="btn variant-filled rounded-3xl m-3"
-					type="button"
-					on:click={clearSearchParams}
-				>
+				<button class="btn variant-filled rounded-3xl m-3" type="button" on:click={clearResults}>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32"
 						><path
 							fill="currentColor"
