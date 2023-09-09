@@ -4,6 +4,8 @@
 	import Sugar from 'sugar';
 	import Markdown from './Markdown.svelte';
 	import type { RetrievalType } from './types';
+	import { higlight } from './utils';
+	import { highlights } from './stores';
 	export let retrievalType: RetrievalType;
 
 	function createPermalink() {
@@ -37,7 +39,7 @@
 						}}
 					/>
 				{/if}
-				{item.title}
+				{@html higlight(item.title, $highlights)}
 			</h1>
 			{#if item.selftext}
 				<div class="mt-2 overflow-hidden">
