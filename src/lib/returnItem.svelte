@@ -54,7 +54,8 @@
 					{Number.isInteger(item.score) ? Sugar.Number.abbr(item.score) : 'unknown'} points
 				</p>
 				<p class="text-xs font-semibold">
-					{Sugar.Date.relative(new Date(item.created_utc * 1000))}
+					{new Date(item.created_utc * 1000).toString().replace(/\((.*?)\)/, '')}
+					({Sugar.Date.relative(new Date(item.created_utc * 1000))})
 				</p>
 			</div>
 		</div>
@@ -77,7 +78,8 @@
 					{Number.isInteger(item.score) ? Sugar.Number.abbr(item.score) : 'unknown'} points
 				</p>
 				<p class="text-xs font-semibold">
-					{Sugar.Date.relative(new Date(item.created_utc * 1000))}
+					{new Date(item.created_utc * 1000).toString().replace(/\((.*?)\)/, '')}
+					({Sugar.Date.relative(new Date(item.created_utc * 1000))})
 				</p>
 			</div>
 		</div>

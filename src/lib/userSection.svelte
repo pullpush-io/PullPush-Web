@@ -106,7 +106,10 @@
 			</p>
 			<p class="text-xs font-semibold">
 				Created {author?.data?.created_utc
-					? Sugar.Date.relative(new Date(author.data.created_utc * 1000))
+					? new Date(author?.data?.created_utc * 1000).toString().replace(/\((.*?)\)/, '') +
+					  '(' +
+					  Sugar.Date.relative(new Date(author.data.created_utc * 1000)) +
+					  ')'
 					: 'unknown'}
 			</p>
 		</div>
