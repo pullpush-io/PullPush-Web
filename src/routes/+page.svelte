@@ -8,12 +8,14 @@
 	import type { Datum, RetrievalType, VizRetrievalType } from '$lib/types';
 	import { goto, afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { highlights } from '$lib/stores';
 	let returnData = [];
 	let authorData = [];
 	let pieData = {};
 	// @ts-expect-error
 	let type: RetrievalType = $page.url.searchParams.get('type') || 'submission';
 	let requestCompleted = false;
+	let highlightEnabled = false;
 
 	function clearInputFields() {
 		const inputs = document.getElementsByTagName('input');
@@ -253,11 +255,18 @@
 		toastStore.clear();
 		loading = true;
 		noParametersWarning = false;
+		submittedRetrievalType = type;
 		const form = e.target as HTMLFormElement;
 		const data = new FormData(form);
 		const value = formVerification(data);
 		const queryString = new URLSearchParams(value).toString();
-		submittedRetrievalType = type;
+
+		if (value && highlightEnabled) {
+			$highlights = value?.q?.split(' ').filter((q) => q) || [];
+		} else {
+			$highlights = [];
+		}
+
 		goto(`/?${queryString}`);
 	}
 
@@ -293,9 +302,15 @@
 				</div>
 			</div>
 			<div class="pb-3 px-3">
-				<label class="label">
+				<label class="label w-full">
 					<span>Query</span>
 					<input name="q" class="input rounded-3xl" type="text" placeholder="Search Term" />
+				</label>
+			</div>
+			<div class="pb-3 px-3">
+				<label>
+					<input class="checkbox mr-1" type="checkbox" bind:checked={highlightEnabled} />
+					Highlight
 				</label>
 			</div>
 			<div class="grid grid-cols-1 sm:grid-cols-2">
