@@ -19,12 +19,7 @@
 </script>
 
 {#if retrievalType === 'submission'}
-	<a
-		class="card"
-		href={`https://reddit.com${item.permalink || createPermalink()}`}
-		target="_blank"
-		rel="noreferrer"
-	>
+	<div class="card">
 		<div
 			class="bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface my-3"
 		>
@@ -59,16 +54,17 @@
 					{new Date(item.created_utc * 1000).toString().replace(/\((.*?)\)/, '')}
 					({Sugar.Date.relative(new Date(item.created_utc * 1000))})
 				</p>
+				<a
+					class="text-xs font-semibold text-error-50"
+					target="_blank"
+					rel="noreferrer"
+					href={`https://reddit.com${item.permalink || createPermalink()}`}>[See on reddit]</a
+				>
 			</div>
 		</div>
-	</a>
+	</div>
 {:else}
-	<a
-		class="card"
-		href={`https://reddit.com${item.permalink || createPermalink()}`}
-		target="_blank"
-		rel="noreferrer"
-	>
+	<div class="card">
 		<div
 			class="bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface my-3"
 		>
@@ -83,7 +79,13 @@
 					{new Date(item.created_utc * 1000).toString().replace(/\((.*?)\)/, '')}
 					({Sugar.Date.relative(new Date(item.created_utc * 1000))})
 				</p>
+				<a
+					class="text-xs font-semibold text-error-50"
+					target="_blank"
+					rel="noreferrer"
+					href={`https://reddit.com${item.permalink || createPermalink()}`}>[See on reddit]</a
+				>
 			</div>
 		</div>
-	</a>
+	</div>
 {/if}
