@@ -3,7 +3,8 @@
 	import '@skeletonlabs/skeleton/styles/skeleton.css';
 	import '../app.postcss';
 	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
-	import { LightSwitch, Toast } from '@skeletonlabs/skeleton';
+	import { Toast } from '@skeletonlabs/skeleton';
+	import LightSwitch from '$lib/LightSwitch.svelte';
 </script>
 
 <Toast rounded="rounded-3xl" shadow="shadow-lg" />
@@ -43,31 +44,27 @@
 						/></svg
 					>
 				</a>
+				<LightSwitch />
 			</svelte:fragment>
 		</AppBar>
 	</center>
 	<svelte:fragment slot="pageFooter">
-		<div class="grid grid-cols-3 p-3 gap-6 items-center">
-			<div class="flex justify-start">
-				<LightSwitch rounded="rounded-3xl" />
-			</div>
-			<div class="text-center">
-				<p class="break-keep">
-					By using <a
-						href="https://pullpush.io"
-						target="_blank"
-						referrerpolicy="no-referrer"
-						class="underline cursor-pointer font-bold break-keep">PullPush.io</a
-					>
-					you agree to the
-					<a
-						href="https://pullpush.io/tos.html"
-						target="_blank"
-						referrerpolicy="no-referrer"
-						class="underline cursor-pointer font-bold break-keep">TOS</a
-					>
-				</p>
-			</div>
+		<div class="flex justify-center pb-3 w-full">
+			<p class=" break-keep">
+				By using <a
+					href="https://pullpush.io"
+					target="_blank"
+					referrerpolicy="no-referrer"
+					class="underline cursor-pointer font-bold break-keep">PullPush.io</a
+				>
+				you agree to the
+				<a
+					href="https://pullpush.io/tos.html"
+					target="_blank"
+					referrerpolicy="no-referrer"
+					class="underline cursor-pointer font-bold break-keep">TOS</a
+				>
+			</p>
 		</div>
 	</svelte:fragment>
 	<slot />
