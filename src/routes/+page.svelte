@@ -17,6 +17,15 @@
 	let requestCompleted = false;
 	let highlightEnabled = false;
 
+	$: {
+		const query = $page.url.searchParams.get('q');
+		if (query && highlightEnabled) {
+			$highlights = query.split(' ').filter((q) => q) || [];
+		} else {
+			$highlights = [];
+		}
+	}
+
 	function clearInputFields() {
 		const inputs = document.getElementsByTagName('input');
 		const selects = document.getElementsByTagName('select');
@@ -260,13 +269,6 @@
 		const data = new FormData(form);
 		const value = formVerification(data);
 		const queryString = new URLSearchParams(value).toString();
-
-		if (value && highlightEnabled) {
-			$highlights = value?.q?.split(' ').filter((q) => q) || [];
-		} else {
-			$highlights = [];
-		}
-
 		goto(`/?${queryString}`);
 	}
 

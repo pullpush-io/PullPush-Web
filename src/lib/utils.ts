@@ -5,10 +5,7 @@ export function higlight(source: string, highlights: Array<string>) {
 		const regex = new RegExp(` ${word}`, 'gi');
 		const matchResult = source.match(regex);
 		if (matchResult) {
-			source = source.replaceAll(
-				regex,
-				`<span class="badge variant-filled-warning ml-1 p-1">${matchResult[0]}</span>`
-			);
+			source = source.replaceAll(regex, `&nbsp;<span class="bg-red-600">${matchResult[0]}</span>`);
 		}
 	}
 
