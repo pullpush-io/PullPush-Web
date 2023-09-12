@@ -462,14 +462,12 @@
 		</div>
 	{/if}
 	{#if Array.isArray(returnData)}
-		<div class="results flex justify-center my-1 mx-5">
-			<div>
-				{#key returnData}
-					{#each returnData as item}
-						<ResultItem retrievalType={submittedRetrievalType} {item} />
-					{/each}
-				{/key}
-			</div>
+		<div class="results flex flex-col items-center justify-center my-1 mx-5">
+			{#key returnData}
+				{#each returnData as item}
+					<ResultItem retrievalType={submittedRetrievalType} {item} />
+				{/each}
+			{/key}
 		</div>
 	{/if}
 	{#if returnData?.length}
