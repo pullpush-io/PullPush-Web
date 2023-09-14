@@ -147,9 +147,25 @@
 		requestCompleted = true;
 	}
 
+	async function getCommentTopics(data: any) {
+		let ids = Array.from(new Set(data.map(({ link_id }) => link_id))).join(',');
+		const response = await fetch(`https://api.pullpush.io/reddit/submission/search?ids=${ids}`);
+		const comments = await response.json();
+
+		for (let { id, title } of comments.data) {
+			if (!title) continue;
+			commentTopics.set('t3_' + id, title);
+		}
+
+		for (let comment of data) {
+			comment._topic = commentTopics.get(comment.link_id);
+		}
+
+		return data;
+	}
+
 	async function fetchPullPush(retrievalType: RetrievalType, value: string) {
 		let _returnData = [];
-		commentTopics.clear();
 
 		try {
 			const response = await fetch(
@@ -159,17 +175,7 @@
 			_returnData = json.data;
 
 			if (retrievalType == 'comment') {
-				let ids = Array.from(new Set(_returnData.map(({ link_id }) => link_id))).join(',');
-				const response = await fetch(`https://api.pullpush.io/reddit/submission/search?ids=${ids}`);
-				const json = await response.json();
-
-				for (let { name, title } of json.data) {
-					commentTopics.set(name, title);
-				}
-
-				for (let comment of _returnData) {
-					comment._topic = commentTopics.get(comment.link_id);
-				}
+				_returnData = await getCommentTopics(_returnData);
 			}
 
 			return _returnData;
@@ -210,6 +216,11 @@
 				paginationCompleted = true;
 				paginating = false;
 				return;
+			}
+
+			if (type == 'comment') {
+				newData = await getCommentTopics(newData);
+				console.log(newData);
 			}
 
 			returnData.push(...newData);
