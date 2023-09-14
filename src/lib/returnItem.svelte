@@ -39,7 +39,12 @@
 			</div>
 		{/if}
 		<div class="mt-3 flex justify-between flex-wrap">
-			<p class="text-xs font-semibold">/u/{item.author}</p>
+			<a
+				href="https://www.reddit.com/user/{item.author}"
+				target="_blank"
+				rel="noreferrer"
+				class="text-xs font-semibold">/u/{item.author}</a
+			>
 			<p class="text-xs font-semibold">
 				{Number.isInteger(item.num_comments) ? Sugar.Number.abbr(item.num_comments) : 'unknown'} comments
 			</p>
@@ -61,7 +66,12 @@
 	{:else}
 		<Markdown source={item.body} />
 		<div class="mt-3 flex justify-between flex-wrap">
-			<p class="text-xs font-semibold">/u/{item.author}</p>
+			<a
+				href="https://www.reddit.com/user/{item.author}"
+				target="_blank"
+				rel="noreferrer"
+				class="text-xs font-semibold">/u/{item.author}</a
+			>
 			<p class="text-xs font-semibold">r/{item.subreddit}</p>
 			<p class="text-xs font-semibold">
 				{Number.isInteger(item.score) ? Sugar.Number.abbr(item.score) : 'unknown'} points
