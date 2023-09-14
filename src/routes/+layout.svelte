@@ -66,6 +66,11 @@
 				>
 			</p>
 		</div>
+		<img
+			class="absolute bottom-4 left-4 opacity-25 w-16"
+			src="/marseydetective.png"
+			alt="detective cat marsey"
+		/>
 	</svelte:fragment>
 	<slot />
 </AppShell>
