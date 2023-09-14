@@ -64,6 +64,9 @@
 			>
 		</div>
 	{:else}
+		<h1 class="text-xl font-bold mr-2 flex items-center break-all pb-2">
+			{@html higlight(item._topic, $highlights)}
+		</h1>
 		<Markdown source={item.body} />
 		<div class="mt-3 flex justify-between flex-wrap">
 			<a

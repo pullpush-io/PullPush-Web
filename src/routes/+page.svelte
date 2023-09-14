@@ -9,6 +9,7 @@
 	import { goto, afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { highlights } from '$lib/stores';
+	let commentTopics = new Map<string, string>();
 	let returnData = [];
 	let authorData = [];
 	let pieData = {};
@@ -148,6 +149,7 @@
 
 	async function fetchPullPush(retrievalType: RetrievalType, value: string) {
 		let _returnData = [];
+		commentTopics.clear();
 
 		try {
 			const response = await fetch(
@@ -155,6 +157,21 @@
 			);
 			const json = await response.json();
 			_returnData = json.data;
+
+			if (retrievalType == 'comment') {
+				let ids = Array.from(new Set(_returnData.map(({ link_id }) => link_id))).join(',');
+				const response = await fetch(`https://api.pullpush.io/reddit/submission/search?ids=${ids}`);
+				const json = await response.json();
+
+				for (let { name, title } of json.data) {
+					commentTopics.set(name, title);
+				}
+
+				for (let comment of _returnData) {
+					comment._topic = commentTopics.get(comment.link_id);
+				}
+			}
+
 			return _returnData;
 		} catch {
 			return {
