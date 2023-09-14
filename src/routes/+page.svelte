@@ -109,7 +109,7 @@
 
 	async function fetchAll() {
 		const url = $page.url;
-		if (url.searchParams.size == 0) {
+		if (url.searchParams.size == 0 || loading) {
 			return;
 		} else if (url.searchParams.size == 1 && url.searchParams.has('type')) {
 			noParametersWarning = true;
