@@ -303,8 +303,6 @@
 	afterNavigate(fetchAll);
 </script>
 
-{@debug loading}
-
 <div class="search flex justify-center my-5 mx-5">
 	<div class="bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface">
 		<form on:submit|preventDefault={handleSubmit}>
