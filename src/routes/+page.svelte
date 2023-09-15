@@ -9,14 +9,25 @@
 	import { goto, afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { highlights } from '$lib/stores';
+
+	let itemCountDiv: HTMLDivElement;
+
 	let commentTopics = new Map<string, string>();
 	let returnData = [];
 	let authorData = [];
 	let pieData = {};
-	// @ts-expect-error
-	let type: RetrievalType = $page.url.searchParams.get('type') || 'submission';
+
+	let noParametersWarning = false;
 	let requestCompleted = false;
 	let highlightEnabled = false;
+	let loading = false;
+	let paginating = false;
+	let paginationCompleted = false;
+
+	// @ts-expect-error
+	let type: RetrievalType = $page.url.searchParams.get('type') || 'submission';
+	// @ts-expect-error
+	let submittedRetrievalType: RetrievalType = $page.url.searchParams.get('type') || 'submission';
 
 	$: {
 		const query = $page.url.searchParams.get('q');
@@ -105,8 +116,6 @@
 		}
 	}
 
-	let noParametersWarning = false;
-
 	async function fetchAll() {
 		const url = $page.url;
 		if (url.searchParams.size == 0 || loading) {
@@ -189,9 +198,6 @@
 			};
 		}
 	}
-
-	let paginating = false;
-	let paginationCompleted = false;
 
 	async function paginate() {
 		if (paginationCompleted) return;
@@ -282,12 +288,6 @@
 		}
 	}
 
-	afterNavigate(fetchAll);
-
-	// @ts-expect-error
-	let submittedRetrievalType: RetrievalType = $page.url.searchParams.get('type') || 'submission';
-	let loading = false;
-
 	async function handleSubmit(e: SubmitEvent) {
 		toastStore.clear();
 		loading = true;
@@ -300,8 +300,10 @@
 		goto(`/?${queryString}`);
 	}
 
-	let itemCountDiv: HTMLDivElement;
+	afterNavigate(fetchAll);
 </script>
+
+{@debug loading}
 
 <div class="search flex justify-center my-5 mx-5">
 	<div class="bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface">
