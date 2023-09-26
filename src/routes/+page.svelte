@@ -341,29 +341,27 @@
 					Highlight
 				</label>
 			</div>
-			{#if type == 'submission'}
-				<div class="flex flex-row w-full">
-					<div class="pb-3 px-3 w-full">
-						<label class="label w-full">
-							<span>Sort By</span>
-							<select class="select rounded-3xl" name="sort_type">
-								<option value="score">Score</option>
-								<option value="num_comments">Number of comments</option>
-								<option value="created_utc">Created date</option>
-							</select>
-						</label>
-					</div>
-					<div class="pb-3 px-3 w-full">
-						<label class="label w-full">
-							<span>Sorting Order</span>
-							<select class="select rounded-3xl" name="sort">
-								<option value="desc">Descending</option>
-								<option value="asc">Ascending</option>
-							</select>
-						</label>
-					</div>
+			<div class="flex flex-row w-full">
+				<div class="pb-3 px-3 w-full">
+					<label class="label w-full">
+						<span>Sort By</span>
+						<select class="select rounded-3xl" name="sort_type">
+							<option value="score">Score</option>
+							<option value="num_comments">Number of comments</option>
+							<option value="created_utc">Created date</option>
+						</select>
+					</label>
 				</div>
-			{/if}
+				<div class="pb-3 px-3 w-full">
+					<label class="label w-full">
+						<span>Sorting Order</span>
+						<select class="select rounded-3xl" name="sort">
+							<option value="desc">Descending</option>
+							<option value="asc">Ascending</option>
+						</select>
+					</label>
+				</div>
+			</div>
 			<div class="grid grid-cols-1 sm:grid-cols-2">
 				<div class="max-w-lg p-3">
 					<label class="label">
