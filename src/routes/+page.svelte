@@ -122,7 +122,6 @@
 			return;
 		} else if (url.searchParams.size == 1 && url.searchParams.has('type')) {
 			noParametersWarning = true;
-			loading = false;
 			return;
 		}
 
@@ -290,7 +289,6 @@
 
 	async function handleSubmit(e: SubmitEvent) {
 		toastStore.clear();
-		loading = true;
 		noParametersWarning = false;
 		submittedRetrievalType = type;
 		const form = e.target as HTMLFormElement;
