@@ -214,14 +214,23 @@
 		} else if (sortType == 'score') {
 			const score = url.searchParams.get('score');
 			const comparator = sort == 'desc' ? '<' : '>';
-			query = query.replace(`score=${score}`, 'score=' + comparator + returnData.at(-1).score);
+			const scoreQuery = 'score=' + comparator + returnData.at(-1).score;
+
+			if (query.includes(`score=${score}`)) {
+				query = query.replace(`score=${score}`, scoreQuery);
+			} else {
+				query += '&' + scoreQuery;
+			}
 		} else if (sortType == 'num_comments') {
 			const num_comments = url.searchParams.get('num_comments');
 			const comparator = sort == 'desc' ? '<' : '>';
-			query = query.replace(
-				`num_comments=${num_comments}`,
-				'num_comments=' + comparator + returnData.at(-1).num_comments
-			);
+			const commentsQuery = 'num_comments=' + comparator + returnData.at(-1).num_comments;
+
+			if (query.includes(`num_comments=${num_comments}`)) {
+				query = query.replace(`num_comments=${num_comments}`, commentsQuery);
+			} else {
+				query += '&' + commentsQuery;
+			}
 		}
 
 		try {
