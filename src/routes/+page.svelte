@@ -144,13 +144,6 @@
 			pieData = [];
 		}
 
-		for (let val of [returnData, authorData, pieData]) {
-			if (val.toast) {
-				toastStore.trigger(val.toast);
-				val = [];
-			}
-		}
-
 		loading = false;
 		requestCompleted = true;
 	}
@@ -188,13 +181,12 @@
 
 			return _returnData;
 		} catch {
-			return {
-				toast: {
-					message: 'An error occurred while searching. Please try again later.',
-					background: 'variant-filled-error',
-					hoverable: true
-				}
-			};
+			toastStore.trigger({
+				message: 'An error occurred while searching. Please try again later.',
+				background: 'variant-filled-error',
+				hoverable: true
+			});
+			return [];
 		}
 	}
 
@@ -249,13 +241,12 @@
 			const data = await response.json();
 			return data;
 		} catch {
-			return {
-				toast: {
-					message: 'An error occurred while getting data. Please try again later.',
-					background: 'variant-filled-error',
-					hoverable: true
-				}
-			};
+			toastStore.trigger({
+				message: 'An error occurred while getting data. Please try again later.',
+				background: 'variant-filled-error',
+				hoverable: true
+			});
+			return [];
 		}
 	}
 
