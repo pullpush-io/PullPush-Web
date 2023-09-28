@@ -82,7 +82,7 @@
 	}
 
 	function populateForm() {
-		let params = $page.url.searchParams;
+		let params = new Map([...$page.url.searchParams]);
 
 		if (params.has('score') && ['<', '>'].includes(params.get('score')[0])) {
 			params.set('score_comparator', params.get('score')[0]);
@@ -217,7 +217,6 @@
 
 			if (type == 'comment') {
 				newData = await getCommentTopics(newData);
-				console.log(newData);
 			}
 
 			returnData.push(...newData);
