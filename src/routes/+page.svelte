@@ -202,7 +202,13 @@
 			query = query + (query == '' ? '' : '&') + `${key}=${val}`;
 		}
 
-		query += `&before=${returnData.at(-1).created_utc}`;
+		if (url.searchParams.get('sort_type') == 'created_utc') {
+			if (url.searchParams.get('sort') == 'desc') {
+				query += `&before=${returnData.at(-1).created_utc}`;
+			} else if (url.searchParams.get('sort') == 'asc') {
+				query += `&after=${returnData.at(-1).created_utc}`;
+			}
+		}
 
 		try {
 			const response = await fetch(`https://api.pullpush.io/reddit/search/${type}/?${query}`);
