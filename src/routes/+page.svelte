@@ -92,7 +92,7 @@
 		}
 
 		if (params.has('num_comments') && ['<', '>'].includes(params.get('num_comments')[0])) {
-			params.set('num_comment_comparator', params.get('num_comments')[0]);
+			params.set('num_comments_comparator', params.get('num_comments')[0]);
 			params.set('num_comments', +params.get('num_comments').slice(1));
 		} else if (params.has('num_comments')) {
 			params.set('num_comments', +params.get('num_comments'));
