@@ -336,9 +336,9 @@
 					<label class="label w-full">
 						<span>Sort By</span>
 						<select class="select rounded-3xl" name="sort_type">
+							<option value="created_utc">Created date</option>
 							<option value="score">Score</option>
 							<option value="num_comments">Number of comments</option>
-							<option value="created_utc">Created date</option>
 						</select>
 					</label>
 				</div>
