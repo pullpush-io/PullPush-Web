@@ -202,12 +202,26 @@
 			query = query + (query == '' ? '' : '&') + `${key}=${val}`;
 		}
 
-		if (url.searchParams.get('sort_type') == 'created_utc') {
-			if (url.searchParams.get('sort') == 'desc') {
+		const sortType = url.searchParams.get('sort_type');
+		const sort = url.searchParams.get('sort');
+
+		if (sortType == 'created_utc') {
+			if (sort == 'desc') {
 				query += `&before=${returnData.at(-1).created_utc}`;
-			} else if (url.searchParams.get('sort') == 'asc') {
+			} else if (sort == 'asc') {
 				query += `&after=${returnData.at(-1).created_utc}`;
 			}
+		} else if (sortType == 'score') {
+			const score = url.searchParams.get('score');
+			const comparator = sort == 'desc' ? '<' : '>';
+			query = query.replace(`score=${score}`, 'score=' + comparator + returnData.at(-1).score);
+		} else if (sortType == 'num_comments') {
+			const num_comments = url.searchParams.get('num_comments');
+			const comparator = sort == 'desc' ? '<' : '>';
+			query = query.replace(
+				`num_comments=${num_comments}`,
+				'num_comments=' + comparator + returnData.at(-1).num_comments
+			);
 		}
 
 		try {
