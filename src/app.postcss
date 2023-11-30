@@ -11,6 +11,10 @@ body {
 }
 
 .variant-custom-ghost {
+	@apply bg-surface-100-800-token text-surface-800 ring-1 ring-surface-500;
+}
+
+:is(.dark .variant-custom-ghost) {
 	@apply bg-[rgb(54,63,75)] text-[rgb(226,255,248)] ring-1 ring-surface-500;
 }
 
