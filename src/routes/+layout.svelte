@@ -10,13 +10,13 @@
 <Toast rounded="rounded-3xl" shadow="shadow-lg" />
 <AppShell>
 	<center class="sticky top-0 z-10">
-		<AppBar class="rounded-b-3xl variant-ghost-surface max-w-5xl">
+		<AppBar class="rounded-b-3xl variant-custom-ghost max-w-5xl">
 			<svelte:fragment slot="lead">
 				<a href="/" class="text-xl font-bold">Reddit Search</a>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<a
-					class="btn btn-sm variant-ghost-surface rounded-2xl"
+					class="btn btn-sm variant-custom-ghost rounded-2xl"
 					href="https://pullpush.io/"
 					target="_blank"
 					rel="noreferrer"
@@ -32,7 +32,7 @@
 					>
 				</a>
 				<a
-					class="btn btn-sm variant-ghost-surface rounded-2xl"
+					class="btn btn-sm variant-custom-ghost rounded-2xl"
 					href="https://discord.gg/jsn3TSS8bs"
 					target="_blank"
 					rel="noreferrer"

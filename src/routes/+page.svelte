@@ -326,7 +326,7 @@
 </script>
 
 <div class="search flex justify-center my-5 mx-5">
-	<div class="bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface">
+	<div class="variant-custom-ghost rounded-3xl max-w-5xl w-full p-4">
 		<form on:submit|preventDefault={handleSubmit}>
 			<div class="grid grid-cols-1 sm:grid-cols-3">
 				<div class="max-w-xs p-3">

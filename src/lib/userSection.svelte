@@ -21,7 +21,7 @@
 
 <div class="max-w-5xl w-full">
 	<div
-		class="flex flex-col items-center bg-surface-100-800-token rounded-3xl max-w-5xl w-full p-4 variant-ghost-surface my-3"
+		class="flex flex-col items-center variant-custom-ghost rounded-3xl max-w-5xl w-full p-4 my-3"
 	>
 		<div class="flex flex-col sm:flex-row w-full items-center justify-between p-8 md:gap-8 gap-16">
 			<a href={`https://reddit.com/user/${authorName}`} target="_blank" rel="noreferrer">

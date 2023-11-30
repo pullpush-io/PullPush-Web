@@ -20,7 +20,7 @@
 	}
 </script>
 
-<div class="rounded-3xl bg-surface-100-800-token max-w-5xl w-full p-4 variant-ghost-surface my-3">
+<div class="rounded-3xl variant-custom-ghost max-w-5xl w-full p-4 my-3">
 	{#if retrievalType === 'submission'}
 		<h1 class="text-xl font-bold mr-2 flex items-center break-all">
 			{#if item.thumbnail !== 'self' && item.thumbnail !== 'default' && item.thumbnail !== 'image' && item.thumbnail !== 'spoiler' && item.thumbnail !== 'nsfw'}

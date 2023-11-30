@@ -15,7 +15,7 @@
 	}
 </script>
 
-<button class="btn btn-sm variant-ghost-surface rounded-2xl" on:click={toggle}>
+<button class="btn btn-sm variant-custom-ghost rounded-2xl" on:click={toggle}>
 	{#if $darkMode}
 		<svg
 			in:fly={{ duration: 200, x: -100 }}
