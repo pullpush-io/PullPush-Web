@@ -1,13 +1,25 @@
 // @ts-expect-error
 export default function formVerification(form) {
 	const value = Object.fromEntries(form.entries());
+	console.log(value);
 	// convert before and after to epoch
 	if (value.before) {
 		value.before = new Date(value.before).getTime() / 1000;
+		if (value.before_hour) {
+			value.before += value.before_hour * 3600 + value.before_minute * 60;
+			delete value.before_hour;
+			delete value.before_minute;
+		}
 	}
 	if (value.after) {
 		value.after = new Date(value.after).getTime() / 1000;
+		if (value.after_hour) {
+			value.after += value.after_hour * 3600 + value.after_minute * 60;
+			delete value.after_hour;
+			delete value.after_minute;
+		}
 	}
+
 	if (value.author) {
 		value.author = value.author.toLowerCase();
 		if (value.author.startsWith('/u/')) {

@@ -24,6 +24,7 @@
 	let paginating = false;
 	let paginationCompleted = false;
 	let searchPostBy: 'q' | 'title' | 'selftext' = 'q';
+	let timeEnabled = false;
 
 	// @ts-expect-error
 	let type: RetrievalType = $page.url.searchParams.get('type') || 'submission';
@@ -35,7 +36,6 @@
 			$page.url.searchParams.get('q') ||
 			$page.url.searchParams.get('title') ||
 			$page.url.searchParams.get('selftext');
-		console.log(query);
 		if (query && highlightEnabled) {
 			$highlights = query.split(' ').filter((str) => str) || [];
 		} else {
@@ -82,6 +82,8 @@
 		}
 
 		let _date = [year, month, day].join('-');
+
+		// TODO: set hours and minutes if it is suitable
 
 		return _date;
 	}
@@ -428,6 +430,66 @@
 					</label>
 				</div>
 			</div>
+			<!-- <label class="pl-3 pb-3">
+				<input class="checkbox mr-1" type="checkbox" bind:checked={timeEnabled} />
+				Enable Time
+			</label> -->
+			{#if timeEnabled}
+				<div class="grid grid-cols-1 sm:grid-cols-2">
+					<div class="max-w-lg p-3">
+						<label class="label">
+							<span>Before Time</span>
+							<div class="flex flex-row gap-2 items-center">
+								<input
+									name="before_hour"
+									title="hour"
+									class="input w-fit"
+									type="number"
+									value="0"
+									min="0"
+									max="23"
+								/>
+								:
+								<input
+									name="before_minute"
+									title="minute"
+									class="input w-fit"
+									type="number"
+									value="0"
+									min="0"
+									max="59"
+								/>
+							</div>
+						</label>
+					</div>
+					<div class="max-w-lg p-3">
+						<label class="label">
+							<span>After Time</span>
+							<div class="flex flex-row gap-2 items-center">
+								<input
+									name="after_hour"
+									title="hour"
+									class="input w-fit"
+									type="number"
+									value="0"
+									min="0"
+									max="23"
+								/>
+								:
+								<input
+									name="after_minute"
+									title="minute"
+									class="input w-fit"
+									type="number"
+									value="0"
+									min="0"
+									max="59"
+								/>
+							</div>
+						</label>
+					</div>
+				</div>
+			{/if}
 			<div class="h-1 w-full variant-ghost-surface rounded-3xl" />
 			<div class="grid grid-cols-1 sm:grid-cols-2">
 				<div class="max-w-lg p-3">
