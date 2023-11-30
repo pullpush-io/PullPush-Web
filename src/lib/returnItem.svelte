@@ -8,6 +8,8 @@
 	import { highlights, darkMode } from './stores';
 	export let retrievalType: RetrievalType;
 
+	console.log(item);
+
 	function createPermalink() {
 		const { subreddit, link_id, id } = item;
 		if (retrievalType == 'submission') {

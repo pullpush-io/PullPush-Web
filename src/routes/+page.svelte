@@ -23,6 +23,7 @@
 	let loading = false;
 	let paginating = false;
 	let paginationCompleted = false;
+	let searchPostBy: 'q' | 'title' | 'selftext' = 'q';
 
 	// @ts-expect-error
 	let type: RetrievalType = $page.url.searchParams.get('type') || 'submission';
@@ -30,9 +31,13 @@
 	let submittedRetrievalType: RetrievalType = $page.url.searchParams.get('type') || 'submission';
 
 	$: {
-		const query = $page.url.searchParams.get('q');
+		const query =
+			$page.url.searchParams.get('q') ||
+			$page.url.searchParams.get('title') ||
+			$page.url.searchParams.get('selftext');
+		console.log(query);
 		if (query && highlightEnabled) {
-			$highlights = query.split(' ').filter((q) => q) || [];
+			$highlights = query.split(' ').filter((str) => str) || [];
 		} else {
 			$highlights = [];
 		}
@@ -348,10 +353,36 @@
 					</label>
 				</div>
 			</div>
+			{#if type == 'submission'}
+				<div class="pb-3 px-3">
+					<label class="label w-fit">
+						<span>Search Post By</span>
+						<div class="flex flex-row gap-12">
+							<label
+								>Title
+								<input name="title" type="radio" value="title" bind:group={searchPostBy} />
+							</label>
+							<label
+								>Body
+								<input name="selftext" type="radio" value="selftext" bind:group={searchPostBy} />
+							</label>
+							<label
+								>Both
+								<input name="q" type="radio" value="q" bind:group={searchPostBy} />
+							</label>
+						</div>
+					</label>
+				</div>
+			{/if}
 			<div class="pb-3 px-3">
 				<label class="label w-full">
 					<span>Query</span>
-					<input name="q" class="input rounded-3xl" type="text" placeholder="Search Term" />
+					<input
+						name={type == 'submission' ? searchPostBy : 'q'}
+						class="input rounded-3xl"
+						type="text"
+						placeholder="Search Term"
+					/>
 				</label>
 			</div>
 			<div class="pb-3 px-3">

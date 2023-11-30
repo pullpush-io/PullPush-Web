@@ -1,5 +1,6 @@
 export function higlight(source: string, highlights: Array<string>) {
 	if (highlights.length == 0) return source;
+	if (!source) return;
 
 	for (let word of highlights) {
 		const regex = new RegExp(` ${word}`, 'gi');
