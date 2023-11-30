@@ -5,7 +5,7 @@
 	import Markdown from './Markdown.svelte';
 	import type { RetrievalType } from './types';
 	import { higlight } from './utils';
-	import { highlights } from './stores';
+	import { highlights, darkMode } from './stores';
 	export let retrievalType: RetrievalType;
 
 	function createPermalink() {
@@ -57,7 +57,7 @@
 				({Sugar.Date.relative(new Date(item.created_utc * 1000))})
 			</p>
 			<a
-				class="text-xs font-semibold text-error-50"
+				class="text-xs font-semibold {$darkMode ? 'text-error-50' : 'text-error-500'}"
 				target="_blank"
 				rel="noreferrer"
 				href={`https://reddit.com${item.permalink || createPermalink()}`}>[See on reddit]</a
@@ -86,7 +86,7 @@
 				({Sugar.Date.relative(new Date(item.created_utc * 1000))})
 			</p>
 			<a
-				class="text-xs font-semibold text-error-50"
+				class="text-xs font-semibold {$darkMode ? 'text-error-50' : 'text-error-500'}"
 				target="_blank"
 				rel="noreferrer"
 				href={`https://reddit.com${item.permalink || createPermalink()}`}>[See on reddit]</a

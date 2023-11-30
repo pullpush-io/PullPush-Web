@@ -1,22 +1,22 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
-	let dark: boolean;
+	import { darkMode } from './stores';
 	let html: HTMLElement;
 
 	onMount(() => {
 		html = document.getElementsByTagName('html')[0];
-		dark = html.classList.contains('dark');
+		$darkMode = html.classList.contains('dark');
 	});
 
 	function toggle() {
-		dark = !dark;
+		$darkMode = !$darkMode;
 		html.classList.toggle('dark');
 	}
 </script>
 
 <button class="btn btn-sm variant-ghost-surface rounded-2xl" on:click={toggle}>
-	{#if dark}
+	{#if $darkMode}
 		<svg
 			in:fly={{ duration: 200, x: -100 }}
 			xmlns="http://www.w3.org/2000/svg"
