@@ -31,6 +31,8 @@
 	let beforeTime: string;
 	let beforeTimeEnabled = false;
 	let afterTimeEnabled = false;
+	let beforeDate: string;
+	let afterDate: string;
 
 	// @ts-expect-error
 	let type: RetrievalType = $page.url.searchParams.get('type') || 'submission';
@@ -115,11 +117,16 @@
 		const inputs = document.getElementsByTagName('input');
 		const selects = document.getElementsByTagName('select');
 
+		console.log(inputs);
+
 		for (let input of [...inputs, ...selects]) {
 			if (params.has(input.name)) {
-				if (['before', 'after'].includes(input.name)) {
+				if (input.name == 'before') {
 					// @ts-expect-error
-					input.value = formatDate(+params.get(input.name));
+					beforeDate = formatDate(+params.get(input.name));
+				} else if (input.name == 'after') {
+					// @ts-expect-error
+					afterDate = formatDate(+params.get(input.name));
 				} else {
 					// @ts-expect-error
 					input.value = params.get(input.name);
@@ -439,18 +446,23 @@
 				<div class="max-w-lg p-3">
 					<label class="label">
 						<span>Before Date</span>
-						<input
+						<SveltyPicker
 							required={beforeTimeEnabled}
-							type="date"
-							class="input rounded-3xl"
+							inputClasses="input rounded-3xl"
 							name="before"
+							bind:value={beforeDate}
 						/>
 					</label>
 				</div>
 				<div class="max-w-lg p-3">
 					<label class="label">
 						<span>After Date</span>
-						<input required={afterTimeEnabled} type="date" class="input rounded-3xl" name="after" />
+						<SveltyPicker
+							required={afterTimeEnabled}
+							inputClasses="input rounded-3xl"
+							name="after"
+							bind:value={afterDate}
+						/>
 					</label>
 				</div>
 			</div>
@@ -675,10 +687,10 @@
 {/if}
 
 <style>
-	:global(.dark) {
+	:global(.dark *) {
 		--sdt-bg-main: rgb(54, 63, 75);
 		--sdt-shadow-color: #777;
-		--sdt-color: #4b5768;
+		--sdt-color: rgb(226, 255, 248);
 		--sdt-clock-color: var(--sdt-color);
 		--sdt-clock-color-hover: var(--sdt-color);
 		--sdt-clock-time-bg: transparent;
@@ -706,7 +718,7 @@
 
 		/* time picker */
 		--sdt-clock-selected-bg: var(--sdt-bg-selected); /** selected time background color */
-		--sdt-clock-bg: #e8eaee; /** time picker inner circle background color */
+		--sdt-clock-bg: #4f5b6d; /** time picker inner circle background color */
 		--sdt-clock-color: var(--sdt-color); /** time picker text color (watch "--sdt-color") */
 		--sdt-clock-color-hover: var(
 			--sdt-color
@@ -716,8 +728,8 @@
 		--sdt-clock-disabled-time: #b22222; /** disabled time picker time text color */
 		--sdt-clock-disabled-time-bg: #eee; /** disabled time picker time background color */
 	}
-	:global(.light) {
-		--sdt-bg-main: #fff;
+	:root {
+		--sdt-bg-main: #e0e3e8;
 		--sdt-shadow-color: #ccc;
 		--sdt-color: inherit;
 		--sdt-clock-color: var(--sdt-color);
@@ -727,7 +739,7 @@
 		--sdt-clock-disabled: #b22222;
 		--sdt-clock-disabled-bg: var(--sdt-bg-main);
 		--sdt-clock-selected-bg: var(--sdt-bg-selected);
-		--sdt-bg-selected: #286090;
+		--sdt-bg-selected: #06b6d4;
 		--sdt-table-disabled-date: #b22222;
 		--sdt-table-disabled-date-bg: var(--sdt-bg-main);
 		--sdt-table-data-bg-hover: #eee;
@@ -737,15 +749,15 @@
 		--sdt-table-today-indicator: #ccc;
 		--sdt-clock-bg: #eeeded;
 		/* custom buttons */
-		--sdt-today-bg: #1e486d;
+		--sdt-today-bg: #06b6d4;
 		--sdt-today-color: #fff;
-		--sdt-clear-color: #dc3545;
-		--sdt-clear-bg: #fff;
+		--sdt-clear-color: #313944;
+		--sdt-clear-bg: #d8dce2;
 		--sdt-clear-hover-color: #fff;
 		--sdt-clear-hover-bg: #dc3545;
 		/* time picker */
 		--sdt-clock-selected-bg: var(--sdt-bg-selected); /** selected time background color */
-		--sdt-clock-bg: #eeeded; /** time picker inner circle background color */
+		--sdt-clock-bg: #d8dce2; /** time picker inner circle background color */
 		--sdt-clock-color: var(--sdt-color); /** time picker text color (watch "--sdt-color") */
 		--sdt-clock-color-hover: var(
 			--sdt-color

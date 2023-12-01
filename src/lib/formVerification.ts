@@ -13,6 +13,7 @@ export default function formVerification(form) {
 			delete value.before_time;
 			delete value.before_time_input;
 		}
+		delete value.before_input;
 	}
 	if (value.after) {
 		value.after = new Date(value.after).getTime() / 1000;
@@ -24,6 +25,7 @@ export default function formVerification(form) {
 			delete value.after_time;
 			delete value.after_time_input;
 		}
+		delete value.after_input;
 	}
 
 	if (value.author) {
