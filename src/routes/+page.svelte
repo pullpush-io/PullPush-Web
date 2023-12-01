@@ -9,6 +9,8 @@
 	import { goto, afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { highlights } from '$lib/stores';
+	import SveltyPicker from 'svelty-picker';
+	import { parseDate } from 'svelty-picker';
 
 	let itemCountDiv: HTMLDivElement;
 
@@ -24,7 +26,11 @@
 	let paginating = false;
 	let paginationCompleted = false;
 	let searchPostBy: 'q' | 'title' | 'selftext' = 'q';
-	let timeEnabled = false;
+	let timeEnabled = true;
+	let afterTime: string;
+	let beforeTime: string;
+	let beforeTimeEnabled = false;
+	let afterTimeEnabled = false;
 
 	// @ts-expect-error
 	let type: RetrievalType = $page.url.searchParams.get('type') || 'submission';
@@ -89,6 +95,7 @@
 	}
 
 	function populateForm() {
+		// TODO: populate afterTime and beforeTime
 		let params = new Map([...$page.url.searchParams]);
 
 		if (params.has('score') && ['<', '>'].includes(params.get('score')[0])) {
@@ -362,15 +369,27 @@
 						<div class="flex flex-row gap-12">
 							<label
 								>Title
-								<input name="title" type="radio" value="title" bind:group={searchPostBy} />
+								<input
+									class="radio"
+									name="title"
+									type="radio"
+									value="title"
+									bind:group={searchPostBy}
+								/>
 							</label>
 							<label
 								>Body
-								<input name="selftext" type="radio" value="selftext" bind:group={searchPostBy} />
+								<input
+									class="radio"
+									name="selftext"
+									type="radio"
+									value="selftext"
+									bind:group={searchPostBy}
+								/>
 							</label>
 							<label
 								>Both
-								<input name="q" type="radio" value="q" bind:group={searchPostBy} />
+								<input class="radio" name="q" type="radio" value="q" bind:group={searchPostBy} />
 							</label>
 						</div>
 					</label>
@@ -420,77 +439,67 @@
 				<div class="max-w-lg p-3">
 					<label class="label">
 						<span>Before Date</span>
-						<input type="date" class="input rounded-3xl" name="before" />
+						<input
+							required={beforeTimeEnabled}
+							type="date"
+							class="input rounded-3xl"
+							name="before"
+						/>
 					</label>
 				</div>
 				<div class="max-w-lg p-3">
 					<label class="label">
 						<span>After Date</span>
-						<input type="date" class="input rounded-3xl" name="after" />
+						<input required={afterTimeEnabled} type="date" class="input rounded-3xl" name="after" />
 					</label>
 				</div>
 			</div>
-			<!-- <label class="pl-3 pb-3">
-				<input class="checkbox mr-1" type="checkbox" bind:checked={timeEnabled} />
-				Enable Time
-			</label> -->
-			{#if timeEnabled}
-				<div class="grid grid-cols-1 sm:grid-cols-2">
+			<div class="grid grid-cols-1 sm:grid-cols-2">
+				<label class="pl-3">
+					<input class="checkbox mr-1" type="checkbox" bind:checked={beforeTimeEnabled} />
+					Enable Before Time
+				</label>
+				<label class="pl-3">
+					<input class="checkbox mr-1" type="checkbox" bind:checked={afterTimeEnabled} />
+					Enable After Time
+				</label>
+			</div>
+			<div class=" grid grid-cols-1 sm:grid-cols-2">
+				{#if beforeTimeEnabled}
 					<div class="max-w-lg p-3">
-						<label class="label">
+						<label class="label flex flex-col">
 							<span>Before Time</span>
-							<div class="flex flex-row gap-2 items-center">
-								<input
-									name="before_hour"
-									title="hour"
-									class="input w-fit"
-									type="number"
-									value="0"
-									min="0"
-									max="23"
-								/>
-								:
-								<input
-									name="before_minute"
-									title="minute"
-									class="input w-fit"
-									type="number"
-									value="0"
-									min="0"
-									max="59"
-								/>
-							</div>
+							<SveltyPicker
+								required
+								name="before_time"
+								inputClasses="bg-surface-700 rounded-3xl w-full text-center"
+								mode="time"
+								format="hh:ii"
+								bind:value={beforeTime}
+							/>
 						</label>
 					</div>
-					<div class="max-w-lg p-3">
+				{:else if afterTimeEnabled}
+					<div class="w-full" />
+				{/if}
+				{#if afterTimeEnabled}
+					<div class="max-w-lg p-3 self-end">
 						<label class="label">
 							<span>After Time</span>
-							<div class="flex flex-row gap-2 items-center">
-								<input
-									name="after_hour"
-									title="hour"
-									class="input w-fit"
-									type="number"
-									value="0"
-									min="0"
-									max="23"
-								/>
-								:
-								<input
-									name="after_minute"
-									title="minute"
-									class="input w-fit"
-									type="number"
-									value="0"
-									min="0"
-									max="59"
-								/>
-							</div>
+							<SveltyPicker
+								required
+								name="after_time"
+								inputClasses="bg-surface-700 rounded-3xl w-full text-center"
+								mode="time"
+								format="hh:ii"
+								bind:value={afterTime}
+							/>
 						</label>
 					</div>
-				</div>
-			{/if}
-			<div class="h-1 w-full variant-ghost-surface rounded-3xl" />
+				{/if}
+			</div>
+			<!-- {/if} -->
+			<div class="h-1 w-full variant-ghost-surface rounded-3xl mt-3" />
 			<div class="grid grid-cols-1 sm:grid-cols-2">
 				<div class="max-w-lg p-3">
 					<label class="label">
@@ -664,3 +673,86 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	:global(.dark) {
+		--sdt-bg-main: rgb(54, 63, 75);
+		--sdt-shadow-color: #777;
+		--sdt-color: #4b5768;
+		--sdt-clock-color: var(--sdt-color);
+		--sdt-clock-color-hover: var(--sdt-color);
+		--sdt-clock-time-bg: transparent;
+		--sdt-clock-time-bg-hover: transparent;
+		--sdt-clock-disabled: #b22222;
+		--sdt-clock-disabled-bg: var(--sdt-bg-main);
+		--sdt-clock-selected-bg: var(--sdt-bg-selected);
+		--sdt-header-color: rgb(226, 255, 248);
+		--sdt-bg-selected: #06b6d4;
+		--sdt-table-disabled-date: #b22222;
+		--sdt-table-disabled-date-bg: var(--sdt-bg-main);
+		--sdt-table-data-bg-hover: #777;
+		--sdt-table-selected-bg: var(--sdt-bg-selected);
+		--sdt-header-btn-bg-hover: #777;
+		--sdt-color-selected: #fff;
+		--sdt-table-today-indicator: #ccc;
+		--sdt-clock-bg: #999;
+		/* custom buttons */
+		--sdt-today-bg: #06b6d4;
+		--sdt-today-color: #fff;
+		--sdt-clear-color: #666;
+		--sdt-clear-bg: #ddd;
+		--sdt-clear-hover-color: #fff;
+		--sdt-clear-hover-bg: #dc3545;
+
+		/* time picker */
+		--sdt-clock-selected-bg: var(--sdt-bg-selected); /** selected time background color */
+		--sdt-clock-bg: #e8eaee; /** time picker inner circle background color */
+		--sdt-clock-color: var(--sdt-color); /** time picker text color (watch "--sdt-color") */
+		--sdt-clock-color-hover: var(
+			--sdt-color
+		); /** time picker hover text color (watch "--sdt-color") */
+		--sdt-clock-time-bg: transparent; /** time picker time background color */
+		--sdt-clock-time-bg-hover: transparent; /** time picker time selection hover background color */
+		--sdt-clock-disabled-time: #b22222; /** disabled time picker time text color */
+		--sdt-clock-disabled-time-bg: #eee; /** disabled time picker time background color */
+	}
+	:global(.light) {
+		--sdt-bg-main: #fff;
+		--sdt-shadow-color: #ccc;
+		--sdt-color: inherit;
+		--sdt-clock-color: var(--sdt-color);
+		--sdt-clock-color-hover: var(--sdt-color);
+		--sdt-clock-time-bg: transparent;
+		--sdt-clock-time-bg-hover: transparent;
+		--sdt-clock-disabled: #b22222;
+		--sdt-clock-disabled-bg: var(--sdt-bg-main);
+		--sdt-clock-selected-bg: var(--sdt-bg-selected);
+		--sdt-bg-selected: #286090;
+		--sdt-table-disabled-date: #b22222;
+		--sdt-table-disabled-date-bg: var(--sdt-bg-main);
+		--sdt-table-data-bg-hover: #eee;
+		--sdt-table-selected-bg: var(--sdt-bg-selected);
+		--sdt-header-btn-bg-hover: #dfdfdf;
+		--sdt-color-selected: #fff;
+		--sdt-table-today-indicator: #ccc;
+		--sdt-clock-bg: #eeeded;
+		/* custom buttons */
+		--sdt-today-bg: #1e486d;
+		--sdt-today-color: #fff;
+		--sdt-clear-color: #dc3545;
+		--sdt-clear-bg: #fff;
+		--sdt-clear-hover-color: #fff;
+		--sdt-clear-hover-bg: #dc3545;
+		/* time picker */
+		--sdt-clock-selected-bg: var(--sdt-bg-selected); /** selected time background color */
+		--sdt-clock-bg: #eeeded; /** time picker inner circle background color */
+		--sdt-clock-color: var(--sdt-color); /** time picker text color (watch "--sdt-color") */
+		--sdt-clock-color-hover: var(
+			--sdt-color
+		); /** time picker hover text color (watch "--sdt-color") */
+		--sdt-clock-time-bg: transparent; /** time picker time background color */
+		--sdt-clock-time-bg-hover: transparent; /** time picker time selection hover background color */
+		--sdt-clock-disabled-time: #b22222; /** disabled time picker time text color */
+		--sdt-clock-disabled-time-bg: #eee; /** disabled time picker time background color */
+	}
+</style>

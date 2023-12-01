@@ -5,18 +5,24 @@ export default function formVerification(form) {
 	// convert before and after to epoch
 	if (value.before) {
 		value.before = new Date(value.before).getTime() / 1000;
-		if (value.before_hour) {
-			value.before += value.before_hour * 3600 + value.before_minute * 60;
-			delete value.before_hour;
-			delete value.before_minute;
+		if (value.before_time) {
+			let [hour, minute] = value.before_time.split(':');
+			hour = +hour;
+			minute = +minute;
+			value.before += hour * 3600 + minute * 60;
+			delete value.before_time;
+			delete value.before_time_input;
 		}
 	}
 	if (value.after) {
 		value.after = new Date(value.after).getTime() / 1000;
-		if (value.after_hour) {
-			value.after += value.after_hour * 3600 + value.after_minute * 60;
-			delete value.after_hour;
-			delete value.after_minute;
+		if (value.after_time) {
+			let [hour, minute] = value.after_time.split(':');
+			hour = +hour;
+			minute = +minute;
+			value.after += hour * 3600 + minute * 60;
+			delete value.after_time;
+			delete value.after_time_input;
 		}
 	}
 
