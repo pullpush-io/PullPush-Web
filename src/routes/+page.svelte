@@ -472,7 +472,7 @@
 							<SveltyPicker
 								required
 								name="before_time"
-								inputClasses="bg-surface-700 rounded-3xl w-full text-center"
+								inputClasses="bg-surface-100-800-token rounded-3xl w-full text-center"
 								mode="time"
 								format="hh:ii"
 								bind:value={beforeTime}
@@ -489,7 +489,7 @@
 							<SveltyPicker
 								required
 								name="after_time"
-								inputClasses="bg-surface-700 rounded-3xl w-full text-center"
+								inputClasses="bg-surface-100-800-token rounded-3xl w-full text-center"
 								mode="time"
 								format="hh:ii"
 								bind:value={afterTime}
