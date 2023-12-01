@@ -10,6 +10,7 @@
 	import { page } from '$app/stores';
 	import { highlights } from '$lib/stores';
 	import SveltyPicker from 'svelty-picker';
+	import TimezonePicker from 'svelte-timezone-picker';
 
 	let itemCountDiv: HTMLDivElement;
 
@@ -336,6 +337,11 @@
 		}
 	}
 
+	function timezoneUpdated(e: CustomEvent) {
+		// TODO: display according to timezone
+		console.log(e.detail.timezone);
+	}
+
 	async function handleSubmit(e: SubmitEvent) {
 		toastStore.clear();
 		noParametersWarning = false;
@@ -520,7 +526,12 @@
 					</div>
 				{/if}
 			</div>
-			<!-- {/if} -->
+			{#if beforeTimeEnabled || afterTimeEnabled}
+				<div class="relative pl-3 py-3">
+					<span>Timezone</span>
+					<TimezonePicker on:update={timezoneUpdated} />
+				</div>
+			{/if}
 			<div class="h-1 w-full variant-ghost-surface rounded-3xl mt-3" />
 			<div class="grid grid-cols-1 sm:grid-cols-2">
 				<div class="max-w-lg p-3">
@@ -737,6 +748,14 @@
 		--sdt-clock-time-bg-hover: transparent; /** time picker time selection hover background color */
 		--sdt-clock-disabled-time: #b22222; /** disabled time picker time text color */
 		--sdt-clock-disabled-time-bg: #eee; /** disabled time picker time background color */
+
+		/* SVELTE TIMEZONE PICKER rgb(226, 255, 248) */
+		--color-white: #4b5768;
+		--color-info-900: #06b6d4;
+		--color-gray-100: rgba(0, 0, 0, 0.2);
+		--color-gray-400: rgb(226, 255, 248);
+		--color-gray-600: rgb(226, 255, 248);
+		--color-gray-900: rgb(226, 255, 248);
 	}
 	:root {
 		--sdt-bg-main: #e0e3e8;
@@ -776,5 +795,16 @@
 		--sdt-clock-time-bg-hover: transparent; /** time picker time selection hover background color */
 		--sdt-clock-disabled-time: #b22222; /** disabled time picker time text color */
 		--sdt-clock-disabled-time-bg: #eee; /** disabled time picker time background color */
+
+		/* SVELTE TIMEZONE PICKER */
+		--color-white: #4b5768;
+		--color-info-900: rgb(226, 255, 248);
+		--color-gray-100: rgba(7, 6, 6, 0.2);
+		--color-gray-400: #acacac;
+		--color-gray-600: #757575;
+		--color-gray-900: #292929;
+	}
+	:global(.dark .tz-dropdown input) {
+		background-color: #4b5768;
 	}
 </style>
