@@ -74,11 +74,25 @@
 		clearInputFields();
 	}
 
-	function formatDate(date: number) {
+	function formatDate(date: number, type: 'before' | 'after') {
 		let d = new Date(date * 1000),
 			month = '' + (d.getMonth() + 1),
 			day = '' + d.getDate(),
-			year = d.getFullYear();
+			year = d.getFullYear(),
+			hours = d.getHours(),
+			minutes = d.getMinutes();
+
+		if (type == 'before') {
+			if (hours > 0 || minutes > 0) {
+				beforeTimeEnabled = true;
+				beforeTime = `${hours}:${minutes}`;
+			}
+		} else {
+			if (hours > 0 || minutes > 0) {
+				afterTimeEnabled = true;
+				afterTime = `${hours}:${minutes}`;
+			}
+		}
 
 		if (month.length < 2) {
 			month = '0' + month;
@@ -95,6 +109,7 @@
 
 	function populateForm() {
 		let params = new Map([...$page.url.searchParams]);
+		console.log(params);
 
 		if (params.has('score') && ['<', '>'].includes(params.get('score')[0])) {
 			params.set('score_comparator', params.get('score')[0]);
@@ -117,10 +132,10 @@
 			if (params.has(input.name)) {
 				if (input.name == 'before') {
 					// @ts-expect-error
-					beforeDate = formatDate(+params.get(input.name));
+					beforeDate = formatDate(+params.get(input.name), 'before');
 				} else if (input.name == 'after') {
 					// @ts-expect-error
-					afterDate = formatDate(+params.get(input.name));
+					afterDate = formatDate(+params.get(input.name), 'after');
 				} else {
 					// @ts-expect-error
 					input.value = params.get(input.name);
@@ -328,6 +343,7 @@
 		const form = e.target as HTMLFormElement;
 		const data = new FormData(form);
 		const value = formVerification(data);
+		console.log(value);
 		const queryString = new URLSearchParams(value).toString();
 		goto(`/?${queryString}`);
 	}

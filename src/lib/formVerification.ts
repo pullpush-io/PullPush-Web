@@ -9,11 +9,11 @@ export default function formVerification(form) {
 			hour = +hour;
 			minute = +minute;
 			value.before += hour * 3600 + minute * 60;
-			delete value.before_time;
-			delete value.before_time_input;
 		}
-		delete value.before_input;
 	}
+	delete value.before_time;
+	delete value.before_time_input;
+	delete value.before_input;
 	if (value.after) {
 		value.after = new Date(value.after).getTime() / 1000;
 		if (value.after_time) {
@@ -21,11 +21,11 @@ export default function formVerification(form) {
 			hour = +hour;
 			minute = +minute;
 			value.after += hour * 3600 + minute * 60;
-			delete value.after_time;
-			delete value.after_time_input;
 		}
-		delete value.after_input;
 	}
+	delete value.after_time;
+	delete value.after_time_input;
+	delete value.after_input;
 
 	if (value.author) {
 		value.author = value.author.toLowerCase();
