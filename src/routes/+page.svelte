@@ -10,7 +10,6 @@
 	import { page } from '$app/stores';
 	import { highlights } from '$lib/stores';
 	import SveltyPicker from 'svelty-picker';
-	import { parseDate } from 'svelty-picker';
 
 	let itemCountDiv: HTMLDivElement;
 
@@ -91,13 +90,10 @@
 
 		let _date = [year, month, day].join('-');
 
-		// TODO: set hours and minutes if it is suitable
-
 		return _date;
 	}
 
 	function populateForm() {
-		// TODO: populate afterTime and beforeTime
 		let params = new Map([...$page.url.searchParams]);
 
 		if (params.has('score') && ['<', '>'].includes(params.get('score')[0])) {
@@ -116,8 +112,6 @@
 
 		const inputs = document.getElementsByTagName('input');
 		const selects = document.getElementsByTagName('select');
-
-		console.log(inputs);
 
 		for (let input of [...inputs, ...selects]) {
 			if (params.has(input.name)) {

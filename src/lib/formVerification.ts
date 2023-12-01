@@ -1,7 +1,6 @@
 // @ts-expect-error
 export default function formVerification(form) {
 	const value = Object.fromEntries(form.entries());
-	console.log(value);
 	// convert before and after to epoch
 	if (value.before) {
 		value.before = new Date(value.before).getTime() / 1000;
