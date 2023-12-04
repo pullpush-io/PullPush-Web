@@ -130,7 +130,6 @@
 				} else if (input.name == 'after') {
 					[afterDate, afterTime] = formatDate(+val);
 					afterTimeEnabled = afterTime != '0:0';
-					console.log(afterDate, afterTime);
 				} else {
 					input.value = val;
 				}
