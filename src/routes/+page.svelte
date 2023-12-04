@@ -11,7 +11,6 @@
 	import { highlights } from '$lib/stores';
 	import SveltyPicker from 'svelty-picker';
 	import TimezonePicker from 'svelte-timezone-picker';
-	import { enhance } from '$app/forms';
 
 	let itemCountDiv: HTMLDivElement;
 
@@ -27,13 +26,13 @@
 	let paginating = false;
 	let paginationCompleted = false;
 	let searchPostBy: 'q' | 'title' | 'selftext' = 'q';
-	let timeEnabled = true;
 	let afterTime: string;
 	let beforeTime: string;
 	let beforeTimeEnabled = false;
 	let afterTimeEnabled = false;
 	let beforeDate: string;
 	let afterDate: string;
+	let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 	// @ts-expect-error
 	let type: RetrievalType = $page.url.searchParams.get('type') || 'submission';
@@ -328,8 +327,6 @@
 			};
 		}
 	}
-
-	let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 	function timezoneUpdated(e: CustomEvent) {
 		timezone = e.detail.timezone;
