@@ -27,6 +27,8 @@ export default function formVerification(form) {
 	delete value.after_time_input;
 	delete value.after_input;
 
+	delete value.timezone;
+
 	if (value.author) {
 		value.author = value.author.toLowerCase();
 		if (value.author.startsWith('/u/')) {

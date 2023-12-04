@@ -81,7 +81,8 @@
 			day = '' + d.getDate(),
 			year = d.getFullYear(),
 			hours = d.getHours(),
-			minutes = d.getMinutes();
+			minutes = d.getMinutes(),
+			offset = d.getTimezoneOffset();
 
 		if (type == 'before') {
 			if (hours > 0 || minutes > 0) {
@@ -110,8 +111,6 @@
 
 	function populateForm() {
 		let params = new Map([...$page.url.searchParams]);
-		console.log(params);
-
 		if (params.has('score') && ['<', '>'].includes(params.get('score')[0])) {
 			params.set('score_comparator', params.get('score')[0]);
 			params.set('score', +params.get('score').slice(1));
@@ -130,16 +129,14 @@
 		const selects = document.getElementsByTagName('select');
 
 		for (let input of [...inputs, ...selects]) {
-			if (params.has(input.name)) {
+			let val = params.get(input.name);
+			if (val) {
 				if (input.name == 'before') {
-					// @ts-expect-error
-					beforeDate = formatDate(+params.get(input.name), 'before');
+					beforeDate = formatDate(+val, 'before');
 				} else if (input.name == 'after') {
-					// @ts-expect-error
-					afterDate = formatDate(+params.get(input.name), 'after');
+					afterDate = formatDate(+val, 'after');
 				} else {
-					// @ts-expect-error
-					input.value = params.get(input.name);
+					input.value = val;
 				}
 			} else {
 				input.value = null;
@@ -337,9 +334,10 @@
 		}
 	}
 
+	let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 	function timezoneUpdated(e: CustomEvent) {
-		// TODO: display according to timezone
-		console.log(e.detail.timezone);
+		timezone = e.detail.timezone;
 	}
 
 	async function handleSubmit(e: SubmitEvent) {
@@ -348,8 +346,8 @@
 		submittedRetrievalType = type;
 		const form = e.target as HTMLFormElement;
 		const data = new FormData(form);
+		data.set('timezone', timezone);
 		const value = formVerification(data);
-		console.log(value);
 		const queryString = new URLSearchParams(value).toString();
 		goto(`/?${queryString}`);
 	}
@@ -797,14 +795,19 @@
 		--sdt-clock-disabled-time-bg: #eee; /** disabled time picker time background color */
 
 		/* SVELTE TIMEZONE PICKER */
-		--color-white: #4b5768;
-		--color-info-900: rgb(226, 255, 248);
-		--color-gray-100: rgba(7, 6, 6, 0.2);
-		--color-gray-400: #acacac;
-		--color-gray-600: #757575;
-		--color-gray-900: #292929;
+		/*  */
+		--color-white: rgb(216, 220, 226);
+		--color-info-900: #06b6d4;
+		--color-gray-100: rgb(216, 220, 226);
+		--color-gray-400: #4b5768;
+		--color-gray-600: #4b5768;
+		--color-gray-900: #4b5768;
 	}
 	:global(.dark .tz-dropdown input) {
 		background-color: #4b5768;
+	}
+	:global(.tz-dropdown input) {
+		background-color: #d8dce2;
+		color: rgba(0, 0, 0, 0.2);
 	}
 </style>
