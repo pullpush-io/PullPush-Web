@@ -11,6 +11,7 @@
 	import { highlights } from '$lib/stores';
 	import SveltyPicker from 'svelty-picker';
 	import TimezonePicker from 'svelte-timezone-picker';
+	import { enhance } from '$app/forms';
 
 	let itemCountDiv: HTMLDivElement;
 
@@ -75,7 +76,7 @@
 		clearInputFields();
 	}
 
-	function formatDate(date: number, type: 'before' | 'after') {
+	function formatDate(date: number) {
 		let d = new Date(date * 1000),
 			month = '' + (d.getMonth() + 1),
 			day = '' + d.getDate(),
@@ -84,17 +85,9 @@
 			minutes = d.getMinutes(),
 			offset = d.getTimezoneOffset();
 
-		if (type == 'before') {
-			if (hours > 0 || minutes > 0) {
-				beforeTimeEnabled = true;
-				beforeTime = `${hours}:${minutes}`;
-			}
-		} else {
-			if (hours > 0 || minutes > 0) {
-				afterTimeEnabled = true;
-				afterTime = `${hours}:${minutes}`;
-			}
-		}
+		hours += offset / 60;
+
+		let time = `${hours}:${minutes}`;
 
 		if (month.length < 2) {
 			month = '0' + month;
@@ -106,7 +99,7 @@
 
 		let _date = [year, month, day].join('-');
 
-		return _date;
+		return [_date, time];
 	}
 
 	function populateForm() {
@@ -132,9 +125,12 @@
 			let val = params.get(input.name);
 			if (val) {
 				if (input.name == 'before') {
-					beforeDate = formatDate(+val, 'before');
+					[beforeDate, beforeTime] = formatDate(+val);
+					beforeTimeEnabled = beforeTime != '0:0';
 				} else if (input.name == 'after') {
-					afterDate = formatDate(+val, 'after');
+					[afterDate, afterTime] = formatDate(+val);
+					afterTimeEnabled = afterTime != '0:0';
+					console.log(afterDate, afterTime);
 				} else {
 					input.value = val;
 				}
