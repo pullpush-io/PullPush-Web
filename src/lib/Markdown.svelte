@@ -3,6 +3,7 @@
 	import MarkdownIt from 'markdown-it';
 	import { highlights } from './stores';
 	import { higlight } from './utils';
+	import xss from 'xss'
 	const md = new MarkdownIt();
 	const alphanumericRegex = /[a-zA-Z0-9]/;
 	md.renderer.rules.image = (tokens, idx, options, env, slf) => {
@@ -24,6 +25,36 @@
 	source = decodeHTML(source);
 	source = md.render(source);
 	source = decodeHTML(source);
+
+	let content = xss(source, {
+		whiteList: {
+			pre: [],
+			code: [],
+			table: [],
+			blockquote: [],
+			br: [],
+			p: [],
+			li: [],
+			ol: [],
+			ul: [],
+			h1: [],
+			h2: [],
+			h3: [],
+			h4: [],
+			h5: [],
+			h6: [],
+			b: [],
+			strong: [],
+			i: [],
+			em: [],
+			s: [],
+			strike: [],
+			img: ['src', 'alt', 'title'],
+			a: ['href', 'title'],
+			sup: [],
+			hr: [],
+		},
+	})
 </script>
 
-{@html higlight(source, $highlights)}
+{@html higlight(content, $highlights)}

@@ -48,7 +48,8 @@
 		"svelte-intersection-observer": "^0.10.1",
 		"svelte-markdown": "^0.3.0",
 		"svelte-timezone-picker": "^2.0.3",
-		"svelty-picker": "^5.2.0"
+		"svelty-picker": "^5.2.0",
+		"xss": "^1.0.15"
 	},
 	"overrides": {
 		"svelte-markdown": {
