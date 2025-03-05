@@ -5,7 +5,7 @@
 	import { ProgressRadial, toastStore } from '@skeletonlabs/skeleton';
 	import ResultItem from '$lib/returnItem.svelte';
 	import UserSection from '$lib/userSection.svelte';
-	import type { Datum, RetrievalType, VizRetrievalType } from '$lib/types';
+	import type { ApiDataItem, Datum, RetrievalType, VizRetrievalType } from '$lib/types';
 	import { goto, afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { highlights } from '$lib/stores';
@@ -14,8 +14,10 @@
 
 	let itemCountDiv: HTMLDivElement;
 
+	const pageSize = 10
+
 	let commentTopics = new Map<string, string>();
-	let returnData = [];
+	let returnData: ApiDataItem[] = [];
 	let authorData = [];
 	let pieData = {};
 
@@ -156,12 +158,12 @@
 
 		if (authorName) {
 			[returnData, authorData, pieData] = await Promise.all([
-				fetchPullPush(type, url.searchParams.toString()),
+				fetchPullPush(type, url.searchParams),
 				fetchAuthorData(authorName),
 				fetchPieData(authorName)
 			]);
 		} else {
-			returnData = await fetchPullPush(type, url.searchParams.toString());
+			returnData = await fetchPullPush(type, url.searchParams);
 			authorData = [];
 			pieData = [];
 		}
@@ -187,12 +189,14 @@
 		return data;
 	}
 
-	async function fetchPullPush(retrievalType: RetrievalType, value: string) {
+	async function fetchPullPush(retrievalType: RetrievalType, params: URLSearchParams) {
 		let _returnData = [];
+
+		params.set('size', String(pageSize))
 
 		try {
 			const response = await fetch(
-				`https://api.pullpush.io/reddit/search/${retrievalType}/?${value}`
+				`https://api.pullpush.io/reddit/search/${retrievalType}/?${params}`
 			);
 			const json = await response.json();
 			_returnData = json.data;
@@ -217,42 +221,31 @@
 		paginating = true;
 		const url = $page.url;
 		let type: RetrievalType = (url.searchParams.get('type') as RetrievalType) || 'submission';
-		let query = '';
+		let query = new URLSearchParams(url.searchParams);
+		query.delete('type')
+		query.delete('before')
 
-		for (let [key, val] of url.searchParams) {
-			if (['type', 'before'].includes(key)) continue;
-			query = query + (query == '' ? '' : '&') + `${key}=${val}`;
+		const sortType = url.searchParams.get('sort_type') || 'created_utc';
+		const sort = url.searchParams.get('sort') || 'desc';
+
+		const lastPost = returnData.at(-1)
+		if(lastPost === undefined) {
+			paginating = false;
+			return;
 		}
 
-		const sortType = url.searchParams.get('sort_type');
-		const sort = url.searchParams.get('sort');
-
-		if (sortType == 'created_utc') {
-			if (sort == 'desc') {
-				query += `&before=${returnData.at(-1).created_utc}`;
+		if (sortType === 'created_utc') {
+			if (sort === 'desc') {
+				query.set('before', String(lastPost.created_utc));
 			} else if (sort == 'asc') {
-				query += `&after=${returnData.at(-1).created_utc}`;
+				query.set('after', String(lastPost.created_utc));
 			}
 		} else if (sortType == 'score') {
-			const score = url.searchParams.get('score');
 			const comparator = sort == 'desc' ? '<' : '>';
-			const scoreQuery = 'score=' + comparator + returnData.at(-1).score;
-
-			if (query.includes(`score=${score}`)) {
-				query = query.replace(`score=${score}`, scoreQuery);
-			} else {
-				query += '&' + scoreQuery;
-			}
+			query.set('score', comparator + lastPost.score);
 		} else if (sortType == 'num_comments') {
-			const num_comments = url.searchParams.get('num_comments');
 			const comparator = sort == 'desc' ? '<' : '>';
-			const commentsQuery = 'num_comments=' + comparator + returnData.at(-1).num_comments;
-
-			if (query.includes(`num_comments=${num_comments}`)) {
-				query = query.replace(`num_comments=${num_comments}`, commentsQuery);
-			} else {
-				query += '&' + commentsQuery;
-			}
+			query.set('num_comments', comparator + lastPost.num_comments)
 		}
 
 		try {
@@ -342,6 +335,7 @@
 		const value = formVerification(data);
 		const queryString = new URLSearchParams(value).toString();
 		goto(`/?${queryString}`);
+		paginationCompleted = false
 	}
 
 	afterNavigate(fetchAll);
@@ -675,8 +669,9 @@
 			<div class="w-full flex items-center justify-center h-24 m-4">
 				<ProgressRadial width="w-24" />
 			</div>
+		{:else if !paginationCompleted}
+			<IntersectionObserver element={itemCountDiv} on:intersect={paginate} />
 		{/if}
-		<IntersectionObserver element={itemCountDiv} on:intersect={paginate} />
 	{:else if requestCompleted}
 		<div class="w-full flex justify-center">
 			<div
