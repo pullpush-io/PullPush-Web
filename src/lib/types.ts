@@ -15,3 +15,9 @@ export type QueryResponse = {
 	authorData?: Object;
 	toast?: ToastSettings;
 };
+
+export type ApiDataItem = {
+	created_utc: number
+	score: number
+	num_comments: number
+}
