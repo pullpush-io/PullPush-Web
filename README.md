@@ -1,4 +1,4 @@
-<h1 align="center">Pull Push Reddit Search</h1>
+<h1 align="center">PullPush Reddit Search</h1>
 
 ### Powered by [PullPush.io](https://pullpush.io)
 
