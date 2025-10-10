@@ -284,11 +284,11 @@
 			const data = await response.json();
 			return data;
 		} catch {
-			toastStore.trigger({
+			/*toastStore.trigger({
 				message: 'An error occurred while getting data. Please try again later.',
 				background: 'variant-filled-error',
 				hoverable: true
-			});
+			});*/
 			return [];
 		}
 	}
