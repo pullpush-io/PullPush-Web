@@ -10,7 +10,7 @@
 	import { page } from '$app/stores';
 	import { highlights } from '$lib/stores';
 	import SveltyPicker from 'svelty-picker';
-	import TimezonePicker from 'svelte-timezone-picker';
+	import TimezonePicker from 'timezone-picker-svelte';
 
 	let itemCountDiv: HTMLDivElement;
 
