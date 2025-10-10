@@ -236,9 +236,9 @@
 
 		if (sortType === 'created_utc') {
 			if (sort === 'desc') {
-				query.set('before', String(lastPost.created_utc));
+				query.set('before', String(lastPost.created_utc - 1));
 			} else if (sort == 'asc') {
-				query.set('after', String(lastPost.created_utc));
+				query.set('after', String(lastPost.created_utc + 1));
 			}
 		} else if (sortType == 'score') {
 			const comparator = sort == 'desc' ? '<' : '>';
