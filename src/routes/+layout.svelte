@@ -12,7 +12,7 @@
 	<center class="sticky top-0 z-10">
 		<AppBar class="rounded-b-3xl variant-custom-ghost max-w-5xl">
 			<svelte:fragment slot="lead">
-				<a href="/" class="text-xl font-bold">Reddit Search</a>
+				<a href="/" class="text-xl font-bold">Pull Push Reddit Search</a>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<a
