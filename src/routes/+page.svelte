@@ -276,30 +276,52 @@
 		}
 	}
 
-	async function fetchViz(author: string, type: VizRetrievalType, datum: Datum) {
+	async function fetchViz(author: string, type: VizRetrievalType) {
 		try {
 			const response = await fetch(
-				`https://api.pullpush.io/analyze_user?user=${author}&type=${type}&datum=${datum}`
+				`https://api.pullpush.io/analyze_user?user=${author}&type=${type}`
 			);
-			const data = await response.json();
-			return data;
+			const json = await response.json();
+
+			if (!json || json.error) {
+				throw new Error('Fetch error');
+			}
+
+			return json.data;
 		} catch {
-			/*toastStore.trigger({
+			toastStore.trigger({
 				message: 'An error occurred while getting data. Please try again later.',
 				background: 'variant-filled-error',
 				hoverable: true
-			});*/
-			return [];
+			});
+			return {};
 		}
 	}
 
 	async function fetchPieData(author: string) {
-		const [topicsCount, topicsKarma, commentsCount, commentsKarma] = await Promise.all([
-			fetchViz(author, 'topics', 'count'),
-			fetchViz(author, 'topics', 'karma'),
-			fetchViz(author, 'comments', 'count'),
-			fetchViz(author, 'comments', 'karma')
+		// Only two requests now: topics and comments
+		const [topicsData, commentsData] = await Promise.all([
+			fetchViz(author, 'topics'),
+			fetchViz(author, 'comments')
 		]);
+
+		// Separate into sorted arrays for count and karma
+		const topicsCount: [string, number][] = Object.entries(topicsData)
+			.map(([sub, values]) => [sub, values.cnt] as [string, number])
+			.sort((a, b) => b[1] - a[1]); // sort descending by value
+
+		const topicsKarma: [string, number][] = Object.entries(topicsData)
+			.map(([sub, values]) => [sub, values.scr] as [string, number])
+			.sort((a, b) => b[1] - a[1]);
+
+		const commentsCount: [string, number][] = Object.entries(commentsData)
+			.map(([sub, values]) => [sub, values.cnt] as [string, number])
+			.sort((a, b) => b[1] - a[1]);
+
+		const commentsKarma: [string, number][] = Object.entries(commentsData)
+			.map(([sub, values]) => [sub, values.scr] as [string, number])
+			.sort((a, b) => b[1] - a[1]);
+
 		return { topicsCount, topicsKarma, commentsCount, commentsKarma };
 	}
 

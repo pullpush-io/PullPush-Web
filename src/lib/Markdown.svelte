@@ -2,7 +2,8 @@
 	import MarkdownIt from 'markdown-it';
 	import { highlights } from './stores';
 	import { higlight, sanitizeHtml } from './utils';
-	import { friendlyAttrValue } from 'xss';
+	import xss from 'xss';
+	const { friendlyAttrValue } = xss;
 	const md = new MarkdownIt({
 		html: true,
 	});

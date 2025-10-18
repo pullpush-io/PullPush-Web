@@ -76,6 +76,10 @@
 				</div>
 			</a>
 			{#key [currentPie, numberType]}
+				{@html (() => {
+					console.log('Rendering pie with data:', currentPie, pieData[currentPie]);
+					return '';
+				})()}
 				<PieChart data={pieData[currentPie]} {numberType}>
 					{#if pieData[currentPie].length > 0}
 						<select class="select rounded-3xl" bind:value={currentPie}>
