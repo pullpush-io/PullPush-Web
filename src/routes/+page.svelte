@@ -193,6 +193,7 @@
 		let _returnData = [];
 
 		params.set('size', String(pageSize))
+		params.set('langid', 'detect')
 
 		try {
 			const response = await fetch(
