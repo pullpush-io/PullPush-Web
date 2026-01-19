@@ -565,26 +565,9 @@
 					</label>
 				</div>
 				<div class="max-w-lg p-3">
-					{#if type == 'submission'}
+					{#if type == 'comment'}
 						<label class="label">
-							<span>Comments</span>
-							<div class="flex">
-								<input
-									name="num_comments"
-									class="input rounded-l-3xl"
-									type="number"
-									placeholder="0"
-									step="50"
-								/>
-								<select name="num_comments_comparator" class="select rounded-r-3xl">
-									<option value=">">Greater Than</option>
-									<option value="<">Less Than</option>
-								</select>
-							</div>
-						</label>
-					{:else if type == 'comment'}
-						<label class="label">
-							<span>Submission ID</span>
+							<span>Parent Post ID</span>
 							<input
 								name="link_id"
 								class="input rounded-3xl"
