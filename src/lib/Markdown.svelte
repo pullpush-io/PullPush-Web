@@ -103,7 +103,6 @@
 
 	export let source: string;
 	$: renderedMarkdown = md.render(replaceSpoilerTags(source))
-	$: console.log(renderedMarkdown)
 	$: content = sanitizeHtml(renderedMarkdown)
 
 	const handleClick = (e: MouseEvent) => {
