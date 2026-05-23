@@ -7,25 +7,26 @@
 	data = data.sort(([n1, v1], [n2, v2]) => v2 - v1);
 
 	function getPercentage(val: number) {
-		let degrees = val * (180 / Math.PI);
-		return Math.floor((degrees / 360) * 100);
-	}
+        return Math.round((val / (2 * Math.PI)) * 100);
+    }
 
-	const sliceCount = data.length < 9 ? data.length : 9;
+	const maxSlices = 9;
+    const sliceCount = Math.min(data.length, maxSlices);
 
-	for (let i = 0; i < sliceCount; i++) {
-		if (i == 4) {
-			let value = data.slice(9).reduce((acc, [_, v]) => {
-				if (v <= 0) return acc;
-				return acc + v;
-			}, 0);
-			_data[i] = { name: 'other', value };
-			continue;
-		}
+    for (let i = 0; i < sliceCount; i++) {
+        if (i === maxSlices - 1 && data.length > maxSlices) {
+            // Last slice aggregates all remaining items into "other"
+            let value = data.slice(maxSlices - 1).reduce((acc, [_, v]) => {
+                if (v <= 0) return acc;
+                return acc + v;
+            }, 0);
+            _data[i] = { name: 'other', value };
+            continue;
+        }
 
-		let [name, value] = data[i];
-		_data[i] = { name, value };
-	}
+        let [name, value] = data[i];
+        _data[i] = { name, value };
+    }
 
 	const width = 224;
 	const height = 224;
