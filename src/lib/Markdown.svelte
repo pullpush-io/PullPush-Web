@@ -36,24 +36,22 @@
 	
 	md.inline.ruler.before('text', 'spoiler', (state, silent) => {
 		const start = state.pos
-		if (state.src.slice(start, start + 2) !== '!!') return false
+		// Reddit spoiler delimiter ">!" arrives HTML-encoded as "&gt;!"
+		if (state.src.slice(start, start + 5) !== '&gt;!') return false
 
-		const end = state.src.indexOf('!!', start + 2)
+		const end = state.src.indexOf('!&lt;', start + 5)
 		if (end === -1) return false
 
 		if (!silent) {
 			const token = state.push('spoiler', '', 0)
-			token.content = state.src.slice(start + 2, end)
+			token.content = state.src.slice(start + 5, end)
 		}
 
-		state.pos = end + 2
+		state.pos = end + 5
 		return true
 	})
 	md.renderer.rules.spoiler = (tokens, idx) => {
 		return `<span class="spoiler">${tokens[idx].content}</span>`
-	}
-	const replaceSpoilerTags = (source: string) => {
-		return source.replaceAll(/&gt;!([^\n]*?)!&lt;/g, '!!$1!!')
 	}
 
 	md.inline.ruler.before('text', 'superscript', (state, silent) => {
@@ -102,7 +100,7 @@
 	}
 
 	export let source: string;
-	$: renderedMarkdown = md.render(replaceSpoilerTags(source))
+	$: renderedMarkdown = md.render(source)
 	$: console.log(renderedMarkdown)
 	$: content = sanitizeHtml(renderedMarkdown)
 
